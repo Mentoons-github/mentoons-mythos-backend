@@ -1,6 +1,7 @@
 import express from "express";
 import morgan from "morgan";
 import config from "./config/config";
+import cors from "cors";
 import DBConnection from "./config/db";
 import cors from 'cors'
 import globalErrorHandling from "./utils/globalsErrorHandling";
@@ -11,6 +12,7 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use(cors())
 
