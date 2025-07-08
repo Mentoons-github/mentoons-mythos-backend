@@ -5,6 +5,7 @@ import cors from "cors";
 import DBConnection from "./config/db";
 import globalErrorHandling from "./utils/globalsErrorHandling";
 import { notFoundHandler } from "./middlewares/notfound";
+import authRoutes from './routes/userRoutes'
 
 const app = express();
 app.use(morgan("dev"));
@@ -15,9 +16,13 @@ app.use(cors());
 DBConnection();
 
 const PORT = config.PORT || 3000;
-app.use(globalErrorHandling);
+
+app.use('/api/v1/auth/',authRoutes)
+
 app.use(notFoundHandler);
+app.use(globalErrorHandling);
 
 app.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
 });
+ 
