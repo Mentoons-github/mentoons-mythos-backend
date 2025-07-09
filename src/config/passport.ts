@@ -1,5 +1,5 @@
 import passport from "passport";
-import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import { Strategy as GoogleStrategy, Profile } from "passport-google-oauth20";
 import config from "./config";
 
 passport.use(
@@ -7,18 +7,16 @@ passport.use(
     {
       clientID: config.GOOGLE_CLIENT_ID!,
       clientSecret: config.GOOGLE_CLIENT_SECRET!,
-      callbackURL: "/auth/google/callback",
+      callbackURL: "http://localhost:5000/api/v1/auth/google/callback",
     },
-    (accessToken, refreshToken, profile, done) => {
-      //Save user info to DB here
+    (
+      accessToken: string,
+      refreshToken: string,
+      profile: Profile,
+      done: (error: any, user?: any) => void
+    ) => {
+      // save or find user in DB here
       return done(null, profile);
     }
   )
 );
-
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-passport.deserializeUser((obj, done) => {
-  done(null, obj);
-});
