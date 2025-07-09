@@ -2,16 +2,22 @@ import express from "express";
 import morgan from "morgan";
 import config from "./config/config";
 import cors from "cors";
+import cookieParser from 'cookie-parser'
 import DBConnection from "./config/db";
 import globalErrorHandling from "./utils/globalsErrorHandling";
 import { notFoundHandler } from "./middlewares/notfound";
-import authRoutes from './routes/userRoutes'
+import authRoutes from './routes/auth.routes'
 
 const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cookieParser())
+app.use(cors({
+  origin:"http://localhost:5173",
+  credentials:true
+}));
+
 
 DBConnection();
 

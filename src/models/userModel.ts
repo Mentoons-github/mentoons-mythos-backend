@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    DOB:{
+    dateOfBirth:{
         type:Date,
 
     },
