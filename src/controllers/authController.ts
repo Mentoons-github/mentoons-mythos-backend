@@ -1,6 +1,7 @@
 import catchAsync from "../utils/cathAsync";
 import userAuthJoi from "../validations/userValidation";
 import * as authServices from "../services/authServices";
+import config from "../config/config";
 import User from "../models/userModel";
 
 export const registerUser = catchAsync(async (req, res) => {
@@ -18,6 +19,21 @@ export const loginUser = catchAsync(async (req, res) => {
     maxAge: 15 * 60 * 1000, // 15 minutes
   });
   return res.status(200).json({ message: "Login Successfull" });
+});
+
+export const googleAuthCallback = catchAsync(async (req, res) => {
+  const googleUser = req.user;
+  const accessToken = await authServices.googleRegister(googleUser);
+
+  res.cookie("authToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  const redirectUrl = `${config.FRONTEND_URL}/oauth-result?status=success`;
+  res.redirect(redirectUrl);
 });
 
 
