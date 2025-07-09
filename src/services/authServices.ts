@@ -1,5 +1,5 @@
 import { ValidationError } from "joi";
-import { IUser } from "../interfaces/userInterface";
+import { Google_userInterface, IUser } from "../interfaces/userInterface";
 import User from "../models/userModel";
 import { passwordCompare, passwordHash } from "../utils/bcrypt";
 import CustomError from "../utils/customError";
@@ -12,8 +12,8 @@ export const registerUser = async (value: IUser, error?: ValidationError) => {
 
   const { firstName, lastName, email, password, DOB, country, about } = value;
 
-  const existringEmail = await User.findOne({ email });
-  if (existringEmail) {
+  const existingEmail = await User.findOne({ email });
+  if (existingEmail) {
     throw new CustomError("email Already registered", 400);
   }
 
@@ -44,4 +44,31 @@ export const loginUser = async (userData: IUser) => {
     email: user.email,
     accessToken,
   };
+};
+
+export const googleRegister = async (googleUser: Google_userInterface) => {
+  console.log("google data recieved :", googleUser);
+  const email = googleUser.emails?.[0]?.value;
+  const userName = googleUser.displayName;
+  const profilePicture = googleUser.photos?.[0]?.value || null;
+
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    const [firstName, ...rest] = userName.split(" ");
+    const lastName = rest.join(" ") || "";
+
+    user = await User.create({
+      firstName,
+      lastName,
+      email,
+      profilePicture,
+      password: null,
+      isGoogleUser: true,
+    });
+  }
+
+  const accessToken = generateAccessToken(user?._id);
+
+  return accessToken;
 };
