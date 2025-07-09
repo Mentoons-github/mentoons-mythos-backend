@@ -3,14 +3,15 @@ import { Google_userInterface, IUser } from "../interfaces/userInterface";
 import User from "../models/userModel";
 import { passwordCompare, passwordHash } from "../utils/bcrypt";
 import CustomError from "../utils/customError";
-import { generateAccessToken } from "../utils/jwt";
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import { generateOTP, saveOTP, sendOTPEmail, verifyOTP } from "../utils/otpGenerator";
 
 export const registerUser = async (value: IUser, error?: ValidationError) => {
   if (error) {
     throw new CustomError(error.details[0].message, 400);
   }
 
-  const { firstName, lastName, email, password, DOB, country, about } = value;
+  const { firstName, lastName, email, password, dateOfBirth, country, about } = value;
 
   const existingEmail = await User.findOne({ email });
   if (existingEmail) {
@@ -24,7 +25,7 @@ export const registerUser = async (value: IUser, error?: ValidationError) => {
     lastName,
     email,
     password: hashedPassword,
-    DOB,
+    dateOfBirth,
     country,
     about,
   });
@@ -38,11 +39,13 @@ export const loginUser = async (userData: IUser) => {
   const validPassword = await passwordCompare(password, user.password);
   if (!validPassword) throw new CustomError("Invalid Password", 400);
   const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id)
 
   return {
     _id: user._id,
     email: user.email,
     accessToken,
+    refreshToken
   };
 };
 
@@ -72,3 +75,17 @@ export const googleRegister = async (googleUser: Google_userInterface) => {
 
   return accessToken;
 };
+
+export const sendOtp = async(email:string) => {
+  const otp = generateOTP()
+  console.log(otp,'otpppp')
+  saveOTP(email,otp)
+  await sendOTPEmail(email, otp);
+}
+
+export const verifyOtpHandler = async({email,otp}:{email:string,otp:string}) => {
+  const isValid = verifyOTP(email,otp)
+
+  if(!isValid) throw new CustomError("Invalid or Expired OTP", 400)
+
+}

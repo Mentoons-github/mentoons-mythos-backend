@@ -19,7 +19,7 @@ const userAuthJoi = Joi.object({
     "any.required": messages.required,
   }),
 
-  DOB: Joi.date()
+  dateOfBirth: Joi.date()
     .less('now')
     .required()
     .messages({

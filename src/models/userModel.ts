@@ -25,7 +25,7 @@ const userSchema = new mongoose.Schema({
       "Password is required for non-Google users",
     ],
   },
-  DOB: {
+  dateOfBirth: {
     type: Date,
   },
   country: {
@@ -43,7 +43,6 @@ const userSchema = new mongoose.Schema({
     default: null,
   },
 });
-
 const User = mongoose.model<IUserDocument>("User", userSchema);
 
 export default User;

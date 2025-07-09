@@ -3,7 +3,11 @@ import {
   googleAuthCallback,
   loginUser,
   registerUser,
+  getUsers,
+  sendOtp,
+  verifyOtpHandler,
 } from "../controllers/authController";
+import userAuth from "../middlewares/authMiddleware";
 import passport from "passport";
 import config from "../config/config";
 
@@ -11,6 +15,9 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/send-otp", sendOtp);
+router.post("/verify-otp", verifyOtpHandler);
+router.get("/user", userAuth, getUsers);
 router.get(
   "/google",
   passport.authenticate("google", {
