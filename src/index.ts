@@ -6,7 +6,6 @@ import passport from "passport";
 import "./config/passport";
 import cookieParser from 'cookie-parser'
 import DBConnection from "./config/db";
-import cors from 'cors'
 import globalErrorHandling from "./utils/globalsErrorHandling";
 import { notFoundHandler } from "./middlewares/notfound";
 import authRoutes from './routes/auth.routes'
@@ -21,8 +20,6 @@ app.use(cors({
   credentials:true
 }));
 
-
-app.use(cors())
 
 DBConnection();
 
