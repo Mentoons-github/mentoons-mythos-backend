@@ -6,38 +6,35 @@ import User from "../models/userModel";
 
 export const registerUser = catchAsync(async (req, res) => {
   const { value, error } = userAuthJoi.validate(req.body);
-  const data = await authServices.registerUser(value, error);
-  res.cookie("token", data.accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-    maxAge: 15 * 60 * 1000,
-  });
-  res.status(201).json({ message: "Registration Successfull", user:data.user });
+  const data = await authServices.registerUser(value, res, error);
+  res
+    .status(201)
+    .json({ message: "Registration Successfull", user: data.user });
 });
 
 export const loginUser = catchAsync(async (req, res) => {
-  const user = await authServices.loginUser(req.body);
-  res.cookie("token", user.accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Strict",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  await authServices.loginUser(req.body, res);
   return res.status(200).json({ message: "Login Successfull" });
 });
 
+export const accessTokenGenerator = catchAsync(async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+  if (!refreshToken) {
+    return res.status(400).json({ message: "Refresh token not found" });
+  }
+  const accessToken = await authServices.accessTokenGenerator(refreshToken);
+  res.status(200).json(accessToken);
+});
+
+export const logout = catchAsync(async(req, res) => {
+  const message = await authServices.logout(res)
+  res.status(200).json({message})
+});
+
+
 export const googleAuthCallback = catchAsync(async (req, res) => {
   const googleUser = req.user;
-  const accessToken = await authServices.googleRegister(googleUser);
-
-  res.cookie("token", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "Lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-
+  await authServices.googleRegister(googleUser, res);
   const redirectUrl = `${config.FRONTEND_URL}/oauth-result?status=success`;
   res.redirect(redirectUrl);
 });
@@ -55,5 +52,6 @@ export const verifyOtpHandler = catchAsync(async (req, res) => {
 
 export const getUsers = catchAsync(async (req, res) => {
   const users = await User.find();
+  console.log(users,'userss')
   return res.status(200).json({ message: "users get", users });
 });
