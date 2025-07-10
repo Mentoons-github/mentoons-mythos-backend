@@ -2,12 +2,12 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import CustomError from "../utils/customError";
 import config from "../config/config";
 import User from "../models/userModel";
-import { RequestHandler, } from "express";
-
+import { RequestHandler } from "express";
 
 const userAuth: RequestHandler = async (req, res, next) => {
   try {
     const token = req.cookies.token;
+    console.log("req.cookies :", req.cookies);
     // || req.headers["authorization"]?.split(" ")[1];
     if (!token) {
       throw new CustomError("Access denied, token missing!", 401);

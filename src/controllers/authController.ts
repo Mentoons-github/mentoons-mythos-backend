@@ -22,7 +22,7 @@ export const loginUser = catchAsync(async (req, res) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Strict",
-    maxAge: 15 * 60 * 1000, // 15 minutes
+    maxAge: 7 * 24 * 60 * 60 * 1000,
   });
   return res.status(200).json({ message: "Login Successfull" });
 });
@@ -31,7 +31,7 @@ export const googleAuthCallback = catchAsync(async (req, res) => {
   const googleUser = req.user;
   const accessToken = await authServices.googleRegister(googleUser);
 
-  res.cookie("authToken", accessToken, {
+  res.cookie("token", accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "Lax",

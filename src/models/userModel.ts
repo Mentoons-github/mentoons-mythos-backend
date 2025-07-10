@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
   dateOfBirth: {
     type: Date,
   },
+  timeOfBirth: {
+    type: String,
+    required: false,
+  },
   country: {
     type: String,
   },
@@ -41,6 +45,14 @@ const userSchema = new mongoose.Schema({
   profilePicture: {
     type: String,
     default: null,
+  },
+  latitude: {
+    type: Number,
+    required: false,
+  },
+  longitude: {
+    type: Number,
+    required: false,
   },
 });
 const User = mongoose.model<IUserDocument>("User", userSchema);
