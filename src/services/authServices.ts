@@ -3,15 +3,26 @@ import { Google_userInterface, IUser } from "../interfaces/userInterface";
 import User from "../models/userModel";
 import { passwordCompare, passwordHash } from "../utils/bcrypt";
 import CustomError from "../utils/customError";
-import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  sendAccessToken,
+  sendRefreshToken,
+  verifyRefreshToken,
+} from "../utils/jwt";
 import {
   generateOTP,
   saveOTP,
   sendOTPEmail,
   verifyOTP,
 } from "../utils/otpGenerator";
+import { Response } from "express";
 
-export const registerUser = async (value: IUser, error?: ValidationError) => {
+export const registerUser = async (
+  value: IUser,
+  res: Response,
+  error?: ValidationError
+) => {
   if (error) {
     throw new CustomError(error.details[0].message, 400);
   }
@@ -37,10 +48,13 @@ export const registerUser = async (value: IUser, error?: ValidationError) => {
   });
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
+  sendAccessToken(res,accessToken)
+  sendRefreshToken(res, refreshToken);
+
   return { user, accessToken, refreshToken };
 };
 
-export const loginUser = async (userData: IUser) => {
+export const loginUser = async (userData: IUser, res: Response) => {
   const { email, password } = userData;
   const user = await User.findOne({ email });
   if (!user) throw new CustomError("Invalid Email id", 400);
@@ -48,7 +62,8 @@ export const loginUser = async (userData: IUser) => {
   if (!validPassword) throw new CustomError("Invalid Password", 400);
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
-
+  sendAccessToken(res,accessToken)
+  sendRefreshToken(res, refreshToken);
   return {
     _id: user._id,
     email: user.email,
@@ -57,7 +72,26 @@ export const loginUser = async (userData: IUser) => {
   };
 };
 
-export const googleRegister = async (googleUser: Google_userInterface) => {
+export const accessTokenGenerator = async (
+  refToken: string
+): Promise<object> => {
+  const payload = verifyRefreshToken(refToken);
+  if (!payload.userId) throw new CustomError("Unauthorized !", 401);
+  const newAccessToken = generateAccessToken(payload.userId);
+  return { accessToken: newAccessToken };
+};
+
+export const logout = async(res:Response) => {
+  res.clearCookie("token");
+  res.clearCookie("refreshToken");
+  
+  return "Logout Successfully"
+}
+
+export const googleRegister = async (
+  googleUser: Google_userInterface,
+  res: Response
+) => {
   console.log("google data recieved :", googleUser);
   const email = googleUser.emails?.[0]?.value;
   const userName = googleUser.displayName;
@@ -80,14 +114,17 @@ export const googleRegister = async (googleUser: Google_userInterface) => {
   }
 
   const accessToken = generateAccessToken(user?._id);
+  const refreshToken = generateRefreshToken(user._id);
+  sendAccessToken(res,accessToken)
+  sendRefreshToken(res, refreshToken);
 
   return accessToken;
 };
 
 export const sendOtp = async (email: string) => {
-  const userExists = await User.findOne({email})
-  if(userExists){
-    throw new CustomError('Email already Registered', 400)
+  const userExists = await User.findOne({ email });
+  if (userExists) {
+    throw new CustomError("Email already Registered", 400);
   }
   const otp = generateOTP();
   saveOTP(email, otp);
