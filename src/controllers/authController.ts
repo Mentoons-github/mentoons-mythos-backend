@@ -6,8 +6,14 @@ import User from "../models/userModel";
 
 export const registerUser = catchAsync(async (req, res) => {
   const { value, error } = userAuthJoi.validate(req.body);
-  const user = await authServices.registerUser(value, error);
-  res.status(201).json({ message: "Registration Successfull", user });
+  const data = await authServices.registerUser(value, error);
+  res.cookie("token", data.accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Strict",
+    maxAge: 15 * 60 * 1000,
+  });
+  res.status(201).json({ message: "Registration Successfull", user:data.user });
 });
 
 export const loginUser = catchAsync(async (req, res) => {
@@ -36,19 +42,18 @@ export const googleAuthCallback = catchAsync(async (req, res) => {
   res.redirect(redirectUrl);
 });
 
+export const sendOtp = catchAsync(async (req, res) => {
+  console.log(req.body, "body");
+  await authServices.sendOtp(req.body.email);
+  return res.status(200).json({ message: "Otp send successfully" });
+});
 
-export const sendOtp = catchAsync(async (req,res) => {
-  console.log(req.body,'body')
-  await authServices.sendOtp(req.body.email)
-  return res.status(200).json({message:"Otp send successfully"})
-})
+export const verifyOtpHandler = catchAsync(async (req, res) => {
+  await authServices.verifyOtpHandler(req.body);
+  return res.status(200).json({ message: "OTP Verification successfull" });
+});
 
-export const verifyOtpHandler = catchAsync (async (req,res) => {
-  await authServices.verifyOtpHandler(req.body)
-  return res.status(200).json({message:"OTP Verification successfull"})
-})
-
-export const getUsers = catchAsync(async(req,res) => {
-  const users = await User.find()
-  return res.status(200).json({message:"users get", users})
-})
+export const getUsers = catchAsync(async (req, res) => {
+  const users = await User.find();
+  return res.status(200).json({ message: "users get", users });
+});

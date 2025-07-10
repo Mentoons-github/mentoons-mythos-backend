@@ -22,8 +22,8 @@ export const sendOTPEmail = async (email: string, otp: string) => {
     console.log(config.EMAIL_PASS,'passss')
 
   const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",         // ✅ correct host
-  port: 465,                      // ✅ secure port
+  host: "smtp.gmail.com",         
+  port: 465,                      
   secure: true, 
   auth: {
     user: config.EMAIL_USER,
@@ -78,15 +78,26 @@ export const saveOTP = (email: string, otp: string, ttlMinutes = 5) => {
   otpStore.set(email, { otp, expiresAt });
 };
 
-export const verifyOTP = (email: string, otp: string): boolean => {
+export const verifyOTP = (
+  email: string,
+  otp: string
+): { status: 'valid' | 'expired' | 'invalid' } => {
   const record = otpStore.get(email);
-  if (!record) return false;
+  if (!record) return { status: 'invalid' };
 
   const { otp: storedOtp, expiresAt } = record;
-  const valid = otp === storedOtp && Date.now() < expiresAt;
 
-  if (valid) otpStore.delete(email); // OTP used, remove it
+  if (Date.now() > expiresAt) {
+    otpStore.delete(email); // cleanup expired
+    return { status: 'expired' };
+  }
 
-  return valid;
+  if (otp !== storedOtp) {
+    return { status: 'invalid' };
+  }
+
+  otpStore.delete(email); // valid and used
+  return { status: 'valid' };
 };
+
 
