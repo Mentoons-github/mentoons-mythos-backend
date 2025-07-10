@@ -4,14 +4,20 @@ import User from "../models/userModel";
 import { passwordCompare, passwordHash } from "../utils/bcrypt";
 import CustomError from "../utils/customError";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
-import { generateOTP, saveOTP, sendOTPEmail, verifyOTP } from "../utils/otpGenerator";
+import {
+  generateOTP,
+  saveOTP,
+  sendOTPEmail,
+  verifyOTP,
+} from "../utils/otpGenerator";
 
 export const registerUser = async (value: IUser, error?: ValidationError) => {
   if (error) {
     throw new CustomError(error.details[0].message, 400);
   }
 
-  const { firstName, lastName, email, password, dateOfBirth, country, about } = value;
+  const { firstName, lastName, email, password, dateOfBirth, country, about } =
+    value;
 
   const existingEmail = await User.findOne({ email });
   if (existingEmail) {
@@ -29,7 +35,9 @@ export const registerUser = async (value: IUser, error?: ValidationError) => {
     country,
     about,
   });
-  return user;
+  const accessToken = generateAccessToken(user._id);
+  const refreshToken = generateRefreshToken(user._id);
+  return { user, accessToken, refreshToken };
 };
 
 export const loginUser = async (userData: IUser) => {
@@ -39,13 +47,13 @@ export const loginUser = async (userData: IUser) => {
   const validPassword = await passwordCompare(password, user.password);
   if (!validPassword) throw new CustomError("Invalid Password", 400);
   const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id)
+  const refreshToken = generateRefreshToken(user._id);
 
   return {
     _id: user._id,
     email: user.email,
     accessToken,
-    refreshToken
+    refreshToken,
   };
 };
 
@@ -76,16 +84,33 @@ export const googleRegister = async (googleUser: Google_userInterface) => {
   return accessToken;
 };
 
-export const sendOtp = async(email:string) => {
-  const otp = generateOTP()
-  console.log(otp,'otpppp')
-  saveOTP(email,otp)
+export const sendOtp = async (email: string) => {
+  const userExists = await User.findOne({email})
+  if(userExists){
+    throw new CustomError('Email already Registered', 400)
+  }
+  const otp = generateOTP();
+  saveOTP(email, otp);
   await sendOTPEmail(email, otp);
-}
+};
 
-export const verifyOtpHandler = async({email,otp}:{email:string,otp:string}) => {
-  const isValid = verifyOTP(email,otp)
+export const verifyOtpHandler = async ({
+  email,
+  otp,
+}: {
+  email: string;
+  otp: string;
+}) => {
+  const result = verifyOTP(email, otp);
 
-  if(!isValid) throw new CustomError("Invalid or Expired OTP", 400)
+  if (result.status === "expired") {
+    throw new CustomError("OTP has expired. Please request a new one.", 400);
+  }
 
-}
+  if (result.status === "invalid") {
+    throw new CustomError(
+      "Invalid OTP. Please check the code and try again.",
+      400
+    );
+  }
+};
