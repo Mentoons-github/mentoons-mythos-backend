@@ -26,11 +26,11 @@ export const accessTokenGenerator = catchAsync(async (req, res) => {
   res.status(200).json(accessToken);
 });
 
-export const logout = catchAsync(async(req, res) => {
-  const message = await authServices.logout(res)
-  res.status(200).json({message})
+export const logout = catchAsync(async (req, res) => {
+  const message = await authServices.logout(res);
+  console.log(message);
+  res.status(200).json({ message });
 });
-
 
 export const googleAuthCallback = catchAsync(async (req, res) => {
   const googleUser = req.user;
@@ -52,6 +52,6 @@ export const verifyOtpHandler = catchAsync(async (req, res) => {
 
 export const getUsers = catchAsync(async (req, res) => {
   const users = await User.find();
-  console.log(users,'userss')
+  console.log(users, "userss");
   return res.status(200).json({ message: "users get", users });
 });

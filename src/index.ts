@@ -12,6 +12,7 @@ import { notFoundHandler } from "./middlewares/notfound";
 //router
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import astrologyRoutes from "./routes/astrology.routes";
 
 const app = express();
 app.use(morgan("dev"));
@@ -31,6 +32,7 @@ const PORT = config.PORT || 3000;
 app.use(passport.initialize());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/astrology", astrologyRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandling);
