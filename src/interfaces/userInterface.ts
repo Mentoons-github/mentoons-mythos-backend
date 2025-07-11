@@ -4,9 +4,18 @@ export interface IUser {
   email: string;
   password: string;
   dateOfBirth?: Date;
+  timeOfBirth: string;
   about?: string;
   country?: string;
   isGoogleUser?: boolean;
+  longitude: string;
+  latitude: string;
+  astrologyDetail?: IAstrologyDetail;
+}
+
+export interface IAstrologyDetail {
+  moonSign?: string;
+  sunSign?: string;
 }
 
 export interface Google_userInterface {

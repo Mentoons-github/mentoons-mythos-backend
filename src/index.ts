@@ -8,12 +8,14 @@ import cookieParser from "cookie-parser";
 import DBConnection from "./config/db";
 import globalErrorHandling from "./utils/globalsErrorHandling";
 import { notFoundHandler } from "./middlewares/notfound";
+import upload from "./middlewares/multer";
 
 //router
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
+import blogRoutes from "./routes/blog.routes";
+import uploadRoutes from "./routes/upload.routes";
 import astrologyRoutes from "./routes/astrology.routes";
-import blogRoutes from './routes/blog.routes'
 
 const app = express();
 app.use(morgan("dev"));
@@ -33,8 +35,9 @@ const PORT = config.PORT || 3000;
 app.use(passport.initialize());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/blog", blogRoutes);
 app.use("/api/v1/astrology", astrologyRoutes);
-app.use("/api/v1/blog", blogRoutes)
+app.use("/api/v1/upload", upload.any(), uploadRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandling);

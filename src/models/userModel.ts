@@ -54,6 +54,14 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
+  astrologyDetail: {
+    moonSign: {
+      type: String,
+    },
+    sunSign: {
+      type: String,
+    },
+  },
 });
 const User = mongoose.model<IUserDocument>("User", userSchema);
 

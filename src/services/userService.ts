@@ -15,5 +15,5 @@ export const UserUpdate = async ({
     throw new CustomError("User updation failed", 404);
   }
 
-  return "User updated successfully";
+  return { user, message: "User updated successfully" };
 };
