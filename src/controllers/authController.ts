@@ -22,7 +22,7 @@ export const accessTokenGenerator = catchAsync(async (req, res) => {
   if (!refreshToken) {
     return res.status(400).json({ message: "Refresh token not found" });
   }
-  const accessToken = await authServices.accessTokenGenerator(refreshToken);
+  const accessToken = await authServices.accessTokenGenerator(res,refreshToken);
   res.status(200).json(accessToken);
 });
 

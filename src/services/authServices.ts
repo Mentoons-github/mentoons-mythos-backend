@@ -73,11 +73,13 @@ export const loginUser = async (userData: IUser, res: Response) => {
 };
 
 export const accessTokenGenerator = async (
+  res:Response,
   refToken: string
 ): Promise<object> => {
   const payload = verifyRefreshToken(refToken);
   if (!payload.userId) throw new CustomError("Unauthorized !", 401);
   const newAccessToken = generateAccessToken(payload.userId);
+  sendAccessToken(res,newAccessToken)
   return { accessToken: newAccessToken };
 };
 
