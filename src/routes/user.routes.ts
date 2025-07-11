@@ -5,6 +5,6 @@ import { fetchUser, updateUser } from "../controllers/userController";
 const router = express.Router();
 
 router.get("/", userAuth, fetchUser);
-router.post("/update-profile", userAuth, updateUser);
+router.put("/update-profile", userAuth, updateUser);
 
 export default router;
