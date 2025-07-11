@@ -1,4 +1,4 @@
-import { ObjectCannedACL, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import s3 from "../utils/s3Client";
 import { v4 as uuid } from "uuid";
 
@@ -23,14 +23,13 @@ const uploadFile = async (
   try {
     const fileExtension = originalname.split(".").pop();
     const uniqueFileName = `${uuid()}.${fileExtension}`;
-    const key = `mentoons-mythos/${category}/${folder}/${Date.now()}-${uniqueFileName}`;
+    const key = `${category}/${folder}/${Date.now()}-${uniqueFileName}`;
 
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME!,
       Key: key,
       Body: fileBuffer,
       ContentType: mimetype,
-      ACL: "public-read" as ObjectCannedACL,
       Metadata: {
         userId,
         originalFileName: originalname,
