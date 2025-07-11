@@ -13,6 +13,7 @@ import { notFoundHandler } from "./middlewares/notfound";
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import astrologyRoutes from "./routes/astrology.routes";
+import blogRoutes from './routes/blog.routes'
 
 const app = express();
 app.use(morgan("dev"));
@@ -33,6 +34,7 @@ app.use(passport.initialize());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/astrology", astrologyRoutes);
+app.use("/api/v1/blog", blogRoutes)
 
 app.use(notFoundHandler);
 app.use(globalErrorHandling);
