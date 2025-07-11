@@ -10,7 +10,8 @@ export const createBlog = async(data:IBlog, userId:string) => {
         writerId: new Types.ObjectId(userId),
         writer:`${user?.firstName} ${user?.lastName}`,
         title:data.title,
-        description:data.description
+        description:data.description,
+        tags: data?.tags?.split(',').map(tag => tag.trim()),
     })
 
     return blog
