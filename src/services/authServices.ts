@@ -48,7 +48,7 @@ export const registerUser = async (
   });
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
-  sendAccessToken(res,accessToken)
+  sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
 
   return { user, accessToken, refreshToken };
@@ -57,12 +57,18 @@ export const registerUser = async (
 export const loginUser = async (userData: IUser, res: Response) => {
   const { email, password } = userData;
   const user = await User.findOne({ email });
+  if (user?.isGoogleUser) {
+    throw new CustomError(
+      "This email is registered via Google login. Please use 'Sign in with Google' instead.",
+      400
+    );
+  }
   if (!user) throw new CustomError("Invalid Email id", 400);
   const validPassword = await passwordCompare(password, user.password);
   if (!validPassword) throw new CustomError("Invalid Password", 400);
   const accessToken = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
-  sendAccessToken(res,accessToken)
+  sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
   return {
     _id: user._id,
@@ -73,22 +79,22 @@ export const loginUser = async (userData: IUser, res: Response) => {
 };
 
 export const accessTokenGenerator = async (
-  res:Response,
+  res: Response,
   refToken: string
 ): Promise<object> => {
   const payload = verifyRefreshToken(refToken);
   if (!payload.userId) throw new CustomError("Unauthorized !", 401);
   const newAccessToken = generateAccessToken(payload.userId);
-  sendAccessToken(res,newAccessToken)
+  sendAccessToken(res, newAccessToken);
   return { accessToken: newAccessToken };
 };
 
-export const logout = async(res:Response) => {
+export const logout = async (res: Response) => {
   res.clearCookie("token");
   res.clearCookie("refreshToken");
-  
-  return "Logout Successfully"
-}
+
+  return "Logout Successfully";
+};
 
 export const googleRegister = async (
   googleUser: Google_userInterface,
@@ -117,7 +123,7 @@ export const googleRegister = async (
 
   const accessToken = generateAccessToken(user?._id);
   const refreshToken = generateRefreshToken(user._id);
-  sendAccessToken(res,accessToken)
+  sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
 
   return accessToken;

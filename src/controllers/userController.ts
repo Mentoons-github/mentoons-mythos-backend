@@ -1,3 +1,7 @@
+import {
+  getAccessToken,
+  getSunAndMoonSign,
+} from "../services/astrologyService";
 import { UserUpdate } from "../services/userService";
 import catchAsync from "../utils/cathAsync";
 
@@ -14,10 +18,44 @@ export const updateUser = catchAsync(async (req, res) => {
   const details = req.body;
   const userId = req.user._id;
 
-  const userUpdation = await UserUpdate({ details, userId });
+  let updatedUser = await UserUpdate({ details, userId });
+
+  const user = updatedUser.user;
+
+  if (
+    user.dateOfBirth &&
+    user.timeOfBirth &&
+    user.latitude &&
+    user.longitude &&
+    !user.astrologyDetail?.sunSign &&
+    !user.astrologyDetail?.moonSign
+  ) {
+    const datetime = `${user.dateOfBirth}T${user.timeOfBirth}`;
+    const latitude = Number(user.latitude);
+    const longitude = Number(user.longitude);
+
+    const token = await getAccessToken();
+
+    const { sunSign, moonSign } = await getSunAndMoonSign({
+      datetime,
+      latitude,
+      longitude,
+      token,
+    });
+
+    updatedUser = await UserUpdate({
+      userId,
+      details: {
+        astrologyDetail: {
+          sunSign,
+          moonSign,
+        },
+      },
+    });
+  }
 
   return res.status(200).json({
-    message: userUpdation,
+    message: updatedUser.message,
     success: true,
   });
 });

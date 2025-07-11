@@ -1,11 +1,10 @@
-import axios from "axios";
 import catchAsync from "../utils/cathAsync";
 import {
   getAccessToken,
   getSunAndMoonSign,
 } from "../services/astrologyService";
 
-export const getAstroDetails = catchAsync(async (req, res) => {
+export const getAstroDetails = catchAsync(async (req, res, next) => {
   const { datetime, latitude, longitude } = req.body;
 
   try {
@@ -24,6 +23,6 @@ export const getAstroDetails = catchAsync(async (req, res) => {
     });
   } catch (err: any) {
     console.error(err.response?.data || err.message);
-    res.status(500).json({ error: "Astrology API failed" });
+    next(err);
   }
 });

@@ -13,6 +13,10 @@ const config = {
   EMAIL_PASS: process.env.EMAIL_PASS,
   PROKERALA_CLIENT_ID: process.env.PROKERALA_CLIENT_ID,
   PROKERALA_CLIENT_SECRET: process.env.PROKERALA_CLIENT_SECRET,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY!,
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID!,
+  AWS_REGION: process.env.AWS_REGION!,
+  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME!,
 };
 
 export default config;
