@@ -5,5 +5,6 @@ export interface IBlog {
     writerId:Types.ObjectId,
     writer:string,
     title:string,
-    description:string
+    description:string,
+    tags:string[]
 }

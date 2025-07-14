@@ -13,23 +13,26 @@ const blogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    writer:{
-        type:String,
-        required:true
+    writer: {
+      type: String,
+      required: true,
     },
     title: {
       type: String,
     },
-    description:{
-        type:String,
-        required:true,
+    tags: {
+      type: [String],
+      default: [],
     },
-
+    description: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-const Blog = mongoose.model<IBlogDocument>('Blog', blogSchema)
-export default Blog
+const Blog = mongoose.model<IBlogDocument>("Blog", blogSchema);
+export default Blog;

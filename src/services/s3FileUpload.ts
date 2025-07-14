@@ -16,14 +16,14 @@ const uploadFile = async (
   fileBuffer: Buffer,
   userId: string,
   category: string,
-  folder: string,
+  // folder: string,
   mimetype: string,
   originalname: string
 ): Promise<UploadResult> => {
   try {
     const fileExtension = originalname.split(".").pop();
     const uniqueFileName = `${uuid()}.${fileExtension}`;
-    const key = `${category}/${folder}/${Date.now()}-${uniqueFileName}`;
+    const key = `${category}/${userId}/${Date.now()}-${uniqueFileName}`;
 
     const params = {
       Bucket: process.env.AWS_BUCKET_NAME!,
@@ -31,7 +31,7 @@ const uploadFile = async (
       Body: fileBuffer,
       ContentType: mimetype,
       Metadata: {
-        userId,
+        userId: String(userId),
         originalFileName: originalname,
         uploadTimestamp: Date.now().toString(),
       },
