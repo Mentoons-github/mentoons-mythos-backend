@@ -6,5 +6,5 @@ export interface IBlog {
     writer:string,
     title:string,
     description:string,
-    tags:string
+    tags:string[]
 }

@@ -22,7 +22,7 @@ const blogSchema = new mongoose.Schema(
     },
     tags: {
       type: [String],
-      required: false, 
+      default: [],
     },
     description: {
       type: String,
