@@ -100,7 +100,6 @@ export const googleRegister = async (
   googleUser: Google_userInterface,
   res: Response
 ) => {
-  console.log("google data recieved :", googleUser);
   const email = googleUser.emails?.[0]?.value;
   const userName = googleUser.displayName;
   const profilePicture = googleUser.photos?.[0]?.value || null;
