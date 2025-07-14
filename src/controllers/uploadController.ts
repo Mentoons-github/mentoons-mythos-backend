@@ -3,13 +3,13 @@ import catchAsync from "../utils/cathAsync";
 import CustomError from "../utils/customError";
 
 export const fileUpload = catchAsync(async (req, res) => {
-  const { category, folder } = req.body;
-  const userId = req.user || "sample";
+  const { category } = req.body;
+  const userId = req?.user?._id || "sample";
 
   const files = req.files as Express.Multer.File[];
 
-  if (!category || !folder)
-    throw new CustomError("Category or folder is empty", 400);
+  if (!category )
+    throw new CustomError("Category is empty", 400);
 
   if (!files || files.length === 0)
     throw new CustomError("no file found to upload", 400);
@@ -26,7 +26,7 @@ export const fileUpload = catchAsync(async (req, res) => {
       file.buffer,
       userId,
       category,
-      folder,
+      // folder,
       file.mimetype,
       file.originalname
     );
