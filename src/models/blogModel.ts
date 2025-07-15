@@ -1,9 +1,9 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { IBlog } from "../interfaces/blogInterface";
 
 export interface IBlogDocument extends IBlog, Document {}
 
-const blogSchema = new mongoose.Schema(
+const blogSchema = new mongoose.Schema<IBlogDocument>(
   {
     file: {
       type: String,
@@ -28,6 +28,9 @@ const blogSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+     likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
+
+
   },
   {
     timestamps: true,
