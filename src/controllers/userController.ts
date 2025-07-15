@@ -8,7 +8,6 @@ import catchAsync from "../utils/cathAsync";
 export const fetchUser = catchAsync(async (req, res) => {
   const user = req.user;
 
-  console.log("user found :", user);
   res.status(200).json({
     success: true,
     user,

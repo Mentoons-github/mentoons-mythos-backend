@@ -1,10 +1,15 @@
-import express from 'express'
-import { createBlog, fetchBlog } from '../controllers/blogController'
-import userAuth from '../middlewares/authMiddleware'
+import express from "express";
+import {
+  createBlog,
+  fetchBlog,
+  fetchUserBlogs,
+} from "../controllers/blogController";
+import userAuth from "../middlewares/authMiddleware";
 
-const routes = express.Router()
+const routes = express.Router();
 
-routes.post('/create',userAuth, createBlog)
-routes.get('/get',userAuth,fetchBlog)
+routes.get("/", userAuth, fetchUserBlogs);
+routes.post("/create", userAuth, createBlog);
+routes.get("/get", userAuth, fetchBlog);
 
-export default routes
+export default routes;

@@ -22,3 +22,9 @@ export const fetchBlog = async () => {
   const blogs = await Blog.find();
   return blogs;
 };
+
+export const userBlog = async (userId: string) => {
+  const blogs = await Blog.find({ writerId: userId });
+  console.log("blogs data :", blogs);
+  return blogs;
+};
