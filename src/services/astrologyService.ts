@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "../config/config";
+import CustomError from "../utils/customError";
 
 interface GetSignParams {
   datetime: string;
@@ -16,7 +17,7 @@ interface SignResponse {
 let token = "";
 let expiresAt = 0;
 
-export const getAccessToken = async () => {
+export const getAstroAccessToken = async () => {
   if (token && Date.now() < expiresAt) return token;
 
   const params = new URLSearchParams();
@@ -40,24 +41,45 @@ export const getSunAndMoonSign = async ({
   longitude,
   token,
 }: GetSignParams): Promise<SignResponse> => {
+  try {
+  } catch (error) {
+    console.log(error);
+  }
   const headers = {
     Authorization: `Bearer ${token}`,
   };
 
-  const sunRes = await axios.post(
-    "https://api.prokerala.com/v2/astrology/sun-sign",
-    { datetime, latitude, longitude },
-    { headers }
-  );
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(datetime)) {
+    throw new Error(
+      "Invalid datetime format. Expected: YYYY-MM-DDTHH:mm:ss+HH:mm"
+    );
+  }
 
-  const moonRes = await axios.post(
-    "https://api.prokerala.com/v2/astrology/moon-sign",
-    { datetime, latitude, longitude },
-    { headers }
-  );
+  // Validate latitude and longitude
+  if (isNaN(latitude) || isNaN(longitude)) {
+    throw new Error("Invalid coordinates");
+  }
+
+  const url = `https://api.prokerala.com/v2/astrology/kundli?ayanamsa=1&datetime=${encodeURIComponent(
+    datetime
+  )}&coordinates=${latitude},${longitude}`;
+  console.log("Prokerala API URL:", url);
+
+  const response = await axios.get(url, { headers });
+
+  const nakshatraDetails = response.data.data.nakshatra_details;
+  if (
+    !nakshatraDetails?.zodiac?.name ||
+    !nakshatraDetails?.chandra_rasi?.name
+  ) {
+    throw new CustomError(
+      "Invalid API response: Missing zodiac or chandra_rasi data",
+      400
+    );
+  }
 
   return {
-    sunSign: sunRes.data.data.sign,
-    moonSign: moonRes.data.data.sign,
+    sunSign: nakshatraDetails.soorya_rasi.name,
+    moonSign: nakshatraDetails.chandra_rasi.name,
   };
 };

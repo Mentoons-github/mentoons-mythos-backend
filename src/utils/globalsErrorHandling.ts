@@ -7,10 +7,10 @@ const globalErrorHandling = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("error got :", err);
-
   const statusCode = err.statusCode || 500;
   const message = err.message || "Internal Server Error";
+
+  console.log("error got :", message);
 
   res.status(statusCode).json({
     success: false,

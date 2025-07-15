@@ -7,6 +7,7 @@ import { RequestHandler } from "express";
 const userAuth: RequestHandler = async (req, res, next) => {
   try {
     const token = req.cookies.token;
+    console.log("access token :", token);
     // || req.headers["authorization"]?.split(" ")[1];
     if (!token) {
       throw new CustomError("Access denied, token missing!", 401);
