@@ -20,6 +20,11 @@ export const fetchBlog = catchAsync(async (req, res) => {
   });
 });
 
+export const fetchSingleBlog = catchAsync (async (req,res) => {
+  const blog = await blogServices.fetchSingleBlog(req.params.blogId)
+  res.status(200).json({message:"Single blog fetched", blog})
+})
+
 
 export const toggleLike = catchAsync(async (req, res) => {
     const blogId = req.params.blogId;
@@ -42,6 +47,15 @@ export const addComment = catchAsync(async(req,res) => {
     const newComment = await blogServices.addComment(blogId, userId, comment)
 
     res.status(201).json({message:"Comment Posted", newComment})
+})
+
+export const replyComment = catchAsync(async(req,res) => {
+  const { commentId } = req.params;
+  const { replyText } = req.body;
+  const userId = req.user._id;
+
+  const updatedComment = await blogServices.replyComment(commentId, userId, replyText);
+  res.status(200).json({ message: "Reply added", comment: updatedComment });
 })
 
 export const getComments = catchAsync(async(req,res) => {
