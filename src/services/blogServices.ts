@@ -37,6 +37,11 @@ export const fetchSingleBlog = async(blogId:string) => {
   return blog
 }
 
+export const userBlog = async (userId: string) => {
+  const blogs = await Blog.find({ writerId: userId });
+  console.log("blogs data :", blogs);
+  return blogs;
+};
 export const likeBlog = async (blogId: string, userId: string ) => {
   const blog = await Blog.findById(blogId);
   if (!blog) throw new CustomError("Blog not found", 404);

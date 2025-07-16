@@ -1,6 +1,6 @@
 import catchAsync from "../utils/cathAsync";
 import {
-  getAccessToken,
+  getAstroAccessToken,
   getSunAndMoonSign,
 } from "../services/astrologyService";
 
@@ -8,7 +8,8 @@ export const getAstroDetails = catchAsync(async (req, res, next) => {
   const { datetime, latitude, longitude } = req.body;
 
   try {
-    const token = await getAccessToken();
+    const token = await getAstroAccessToken();
+    console.log("token :", token);
 
     const { sunSign, moonSign } = await getSunAndMoonSign({
       datetime,

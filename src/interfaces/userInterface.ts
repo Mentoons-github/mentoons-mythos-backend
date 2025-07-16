@@ -11,6 +11,7 @@ export interface IUser {
   isGoogleUser?: boolean;
   longitude: string;
   latitude: string;
+  profilePicture?: string;
   astrologyDetail?: IAstrologyDetail;
 }
 
