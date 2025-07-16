@@ -5,6 +5,7 @@ export interface IUser {
   password: string;
   dateOfBirth?: Date;
   timeOfBirth: string;
+  profilePicture?:string
   about?: string;
   country?: string;
   isGoogleUser?: boolean;

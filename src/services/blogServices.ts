@@ -32,6 +32,11 @@ export const fetchBlog = async (skip: number = 0, limit: number = 10) => {
   return { blogs, total };
 };
 
+export const fetchSingleBlog = async(blogId:string) => {
+  const blog = await Blog.findById(blogId)
+  return blog
+}
+
 export const userBlog = async (userId: string) => {
   const blogs = await Blog.find({ writerId: userId });
   console.log("blogs data :", blogs);
@@ -56,11 +61,30 @@ export const addComment = async (blogId:string, userId:string, comment:IComment)
     blogId,
     userId,
     username:`${user?.firstName} ${user?.lastName}`,
-    comment
+    profile:`${user?.profilePicture}`,
+    comment,
   })
 
   return newComment
 }
+
+export const replyComment = async (commentId: string, userId: string, replyText: string) => {
+   const user = await User.findById(userId)
+  return await Comment.findByIdAndUpdate(
+    commentId,
+    {
+      $push: {
+        reply: {
+          userId,
+          username:`${user?.firstName} ${user?.lastName}`,
+          replyText,
+          profile:user?.profilePicture,
+        },
+      },
+    },
+    { new: true }
+  );
+};
 
 export const getComments = async (blogId:string) =>{
   const blog = await Comment.find({blogId}).sort({createdAt: -1})
