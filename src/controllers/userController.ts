@@ -2,7 +2,7 @@ import {
   getAstroAccessToken,
   getSunAndMoonSign,
 } from "../services/astrologyService";
-import { UserUpdate } from "../services/userService";
+import * as userService from "../services/userService";
 import catchAsync from "../utils/cathAsync";
 
 export const fetchUser = catchAsync(async (req, res) => {
@@ -18,7 +18,7 @@ export const updateUser = catchAsync(async (req, res) => {
   const { data: details } = req.body;
 
   const userId = req.user._id;
-  let updatedUser = await UserUpdate({ details, userId });
+  let updatedUser = await userService.UserUpdate({ details, userId });
 
   const user = updatedUser.user;
 
@@ -58,7 +58,7 @@ export const updateUser = catchAsync(async (req, res) => {
 
     console.log("sun sign :", sunSign, "moon sign :", moonSign);
 
-    updatedUser = await UserUpdate({
+    updatedUser = await userService.UserUpdate({
       userId,
       details: {
         astrologyDetail: {
@@ -76,4 +76,19 @@ export const updateUser = catchAsync(async (req, res) => {
     message: updatedUser.message,
     success: true,
   });
+});
+
+export const reportUser = catchAsync(async (req, res) => {
+  const reportedBy = req.user._id;
+  const { userId  } = req.params;
+  const { reason, from, fromId } = req.body;
+  const report = await userService.reportUser({
+    reportedBy,
+    userId,
+    fromId,
+    reason,
+    from
+  });
+
+  res.status(201).json({ message: "Report Submitted", report });
 });

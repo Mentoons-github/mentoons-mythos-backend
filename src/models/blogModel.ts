@@ -29,8 +29,10 @@ const blogSchema = new mongoose.Schema<IBlogDocument>(
       required: true,
     },
      likes: [{ type: Schema.Types.ObjectId, ref: "User" }],
-
-
+     commentsOff:{
+      type:Boolean,
+      default:false
+     }
   },
   {
     timestamps: true,

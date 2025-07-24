@@ -10,6 +10,7 @@ export const createBlog = async (data: IBlog, userId: string) => {
   const user = await User.findById(userId).select("firstName lastName");
   const blog = await Blog.create({
     file: data?.file,
+    commentsOff:data?.commentsOff,
     writerId: new Types.ObjectId(userId),
     writer: `${user?.firstName} ${user?.lastName}`,
     title: data.title,
