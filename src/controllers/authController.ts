@@ -20,7 +20,8 @@ export const loginUser = catchAsync(async (req, res) => {
 export const accessTokenGenerator = catchAsync(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
   if (!refreshToken) {
-    return res.status(400).json({ message: "Refresh token not found" });
+    console.log('no refresh token')
+    return res.status(401).json({ message: "Refresh token not found" });
   }
   const accessToken = await authServices.accessTokenGenerator(res,refreshToken);
   res.status(200).json(accessToken);

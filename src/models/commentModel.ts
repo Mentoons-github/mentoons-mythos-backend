@@ -1,5 +1,27 @@
 import mongoose, { Schema } from "mongoose";
-import { IComment } from "../interfaces/commentInterface";
+import { IComment, IReply } from "../interfaces/commentInterface";
+
+const replySchema = new Schema<IReply>(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    username: {
+      type: String,
+      required: true,
+    },
+    replyText: {
+      type: String,
+      required: true,
+    },
+    profile: {
+      type: String
+    }
+  },
+  { timestamps: true }
+);
 
 const commentSchema = new Schema<IComment>(
   {
@@ -23,7 +45,8 @@ const commentSchema = new Schema<IComment>(
     },
     profile:{
         type:String
-    }
+    },
+    reply:[replySchema]
   },
   { timestamps: true }
 );
