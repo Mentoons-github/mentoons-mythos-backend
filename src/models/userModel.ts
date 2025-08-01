@@ -62,6 +62,14 @@ const userSchema = new mongoose.Schema({
       type: String,
     },
   },
+  isBlocked:{
+    type:Boolean,
+    default:false
+  },
+  role:{
+    type:String,
+    default:"user"
+  }
 });
 const User = mongoose.model<IUserDocument>("User", userSchema);
 

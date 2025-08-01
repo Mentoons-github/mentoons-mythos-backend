@@ -14,7 +14,7 @@ const blogSchema = new mongoose.Schema<IBlogDocument>(
       required: true,
     },
     writer: {
-      type: String,
+      type: String, 
       required: true,
     },
     title: {
@@ -32,7 +32,8 @@ const blogSchema = new mongoose.Schema<IBlogDocument>(
      commentsOff:{
       type:Boolean,
       default:false
-     }
+     },
+     viewers: [{ type: Schema.Types.ObjectId, ref: "User" }]
   },
   {
     timestamps: true,

@@ -14,6 +14,26 @@ export const fetchUser = catchAsync(async (req, res) => {
   });
 });
 
+export const fetchAllUsers = catchAsync(async(req,res) => {
+  const users = await userService.fetchAllUsers()
+  res.status(200).json({
+    success:true,
+    users
+  })
+})
+
+export const blockUser = catchAsync(async(req,res) => {
+  const {userId} = req.params
+  const currentUserId = req.user._id
+  const updatedUser = await userService.blockUser(userId, currentUserId)
+
+  res.status(200).json({
+    success:true,
+    message: updatedUser?.isBlocked ? "User has been blocked" : "User has been unblocked",
+    user:updatedUser
+  })
+})
+
 export const updateUser = catchAsync(async (req, res) => {
   const { data: details } = req.body;
 

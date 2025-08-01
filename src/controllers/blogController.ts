@@ -16,7 +16,7 @@ export const fetchBlog = catchAsync(async (req, res) => {
     message: "Successfully fetched blogs",
     blogs,
     total,
-    userId:req.user._id
+    // userId:req.user._id
   });
 });
 
@@ -69,4 +69,28 @@ export const getComments = catchAsync(async(req,res) => {
     const {blogId} = req.params
     const comments = await blogServices.getComments(blogId)
     res.status(200).json({message:"Fetched comments", comments})
+})
+
+export const increaseViewsCount = catchAsync(async(req,res) => {
+  const {blogId} = req.params
+  const userId = req.user._id
+
+  const totalViews = await blogServices.increaseViewsCount(blogId,userId)
+
+  res.status(200).json({
+    status: "success",
+    message: "View count updated",
+    totalViews,
+  });
+})
+
+
+export const fetchBlogByViews = catchAsync(async(req,res) => {
+  const blogs = await blogServices.fetchBlogByViews()
+
+  res.status(200).json({
+    status:"success",
+    message:"Successfully fetched blogs",
+    blogs
+  })
 })

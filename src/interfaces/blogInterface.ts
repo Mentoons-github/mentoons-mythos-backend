@@ -8,5 +8,6 @@ export interface IBlog {
     description:string,
     tags:string[]
     likes?: mongoose.Types.ObjectId[];
-    commentsOff:boolean
+    commentsOff:boolean;
+    viewers:mongoose.Types.ObjectId[]
 }

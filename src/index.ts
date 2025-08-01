@@ -9,6 +9,8 @@ import DBConnection from "./config/db";
 import globalErrorHandling from "./utils/globalsErrorHandling";
 import { notFoundHandler } from "./middlewares/notfound";
 import upload from "./middlewares/multer";
+import { createServer } from "http";
+import { setupSocket } from "./socket/socket";
 
 //router
 import authRoutes from "./routes/auth.routes";
@@ -16,6 +18,8 @@ import userRoutes from "./routes/user.routes";
 import blogRoutes from "./routes/blog.routes";
 import uploadRoutes from "./routes/upload.routes";
 import astrologyRoutes from "./routes/astrology.routes";
+import chatRoutes from './routes/chat.routes'
+import assessmentRoutes from './routes/assessment.route'
 
 const app = express();
 app.use(morgan("dev"));
@@ -38,10 +42,16 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/blog", blogRoutes);
 app.use("/api/v1/astrology", astrologyRoutes);
 app.use("/api/v1/upload", upload.any(), uploadRoutes);
+app.use('/api/v1/chat',chatRoutes)
+app.use('/api/v1/assessment', assessmentRoutes)
 
 app.use(notFoundHandler);
 app.use(globalErrorHandling);
 
-app.listen(PORT, () => {
+const server = createServer(app)
+
+setupSocket(server)
+
+ server.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
 });
