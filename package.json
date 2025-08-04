@@ -2,11 +2,11 @@
   "name": "mentoons-mythos-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
