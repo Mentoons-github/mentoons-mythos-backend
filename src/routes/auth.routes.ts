@@ -8,6 +8,7 @@ import {
   verifyOtpHandler,
   accessTokenGenerator,
   logout,
+  forgotPassword,
 } from "../controllers/authController";
 import userAuth from "../middlewares/authMiddleware";
 import passport from "passport";
@@ -20,6 +21,7 @@ router.post("/login", loginUser);
 router.get("/get-access-token",accessTokenGenerator)
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtpHandler);
+router.post("/forgot-password",forgotPassword)
 router.post('/logout',logout)
 router.get("/user", userAuth, getUsers);
 router.get(

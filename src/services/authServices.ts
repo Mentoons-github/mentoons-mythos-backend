@@ -57,9 +57,9 @@ export const registerUser = async (
 export const loginUser = async (userData: IUser, res: Response) => {
   const { email, password } = userData;
   const user = await User.findOne({ email });
-  if (user?.isGoogleUser) {
+  if (user?.isGoogleUser && !user.password) {
     throw new CustomError(
-      "This email is registered via Google login. Please use 'Sign in with Google' instead.",
+      "This email is registered via Google login. Please use 'Sign in with Google' instead, or add password from 'Forgot your password'",
       400
     );
   }
@@ -157,4 +157,31 @@ export const verifyOtpHandler = async ({
       400
     );
   }
+};
+
+export const forgotPassword = async ({
+  email,
+  newPassword,
+}: {
+  email: string;
+  newPassword: string;
+}) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new CustomError("Email Not Registered", 400);
+  }
+
+  if (newPassword.length < 6) {
+    throw new CustomError("Password should have at least 6 characters", 400);
+  }
+  if (newPassword.length > 10) {
+    throw new CustomError("Password cannot exceed 10 characters", 400);
+  }
+
+  console.log(newPassword.length);
+
+  user.password = await passwordHash(newPassword);
+  await user.save();
+
+  return "Password reset successful";
 };
