@@ -7,7 +7,7 @@ passport.use(
     {
       clientID: config.GOOGLE_CLIENT_ID!,
       clientSecret: config.GOOGLE_CLIENT_SECRET!,
-      callbackURL: "http://localhost:5000/api/v1/auth/google/callback",
+      callbackURL: `${config.BACKEND_URL}/api/v1/auth/google/callback`,
     },
     (
       accessToken: string,
