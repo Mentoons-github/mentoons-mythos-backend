@@ -17,6 +17,9 @@ const config = {
   AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID!,
   AWS_REGION: process.env.AWS_REGION!,
   AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME!,
+  CCAVENUE_MERCHANT_ID: process.env.CCAVENUE_MERCHANT_ID!,
+  CCAVENUE_WORKING_KEY: process.env.CCAVENUE_WORKING_KEY!,
+  CCAVENUE_ACCESS_CODE: process.env.CCAVENUE_ACCESS_CODE!,
 };
 
 export default config;
