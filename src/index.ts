@@ -29,7 +29,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [config.FRONTEND_URL, "https://mentoonsmythos.com"],
+    origin: [
+      config.FRONTEND_URL,
+      "https://mentoonsmythos.com",
+      "http://localhost:5173",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    exposedHeaders: [
+      "Cross-Origin-Opener-Policy",
+      "Cross-Origin-Resource-Policy",
+      "Access-Control-Allow-Origin",
+    ],
     credentials: true,
   })
 );
