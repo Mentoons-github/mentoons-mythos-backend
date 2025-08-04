@@ -51,6 +51,11 @@ export const verifyOtpHandler = catchAsync(async (req, res) => {
   return res.status(200).json({ message: "OTP Verification successfull" });
 });
 
+export const forgotPassword = catchAsync(async (req,res) => {
+  const message = await authServices.forgotPassword(req.body)
+  res.status(200).json({success:true,message})
+})
+
 export const getUsers = catchAsync(async (req, res) => {
   const users = await User.find();
   console.log(users, "userss");

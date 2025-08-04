@@ -14,7 +14,7 @@ export const generateOTP = (length = 6): string => {
   console.log(otp,'otpppppppp')
   return otp;
 };
-
+ 
 
 export const sendOTPEmail = async (email: string, otp: string) => {
     console.log(email,otp,'email and otp')
