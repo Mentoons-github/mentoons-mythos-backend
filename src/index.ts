@@ -18,8 +18,9 @@ import userRoutes from "./routes/user.routes";
 import blogRoutes from "./routes/blog.routes";
 import uploadRoutes from "./routes/upload.routes";
 import astrologyRoutes from "./routes/astrology.routes";
-import chatRoutes from './routes/chat.routes'
-import assessmentRoutes from './routes/assessment.route'
+import chatRoutes from "./routes/chat.routes";
+import assessmentRoutes from "./routes/assessment.route";
+import paymentRoutes from "./routes/payment.routes";
 
 const app = express();
 app.use(morgan("dev"));
@@ -42,16 +43,17 @@ app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/blog", blogRoutes);
 app.use("/api/v1/astrology", astrologyRoutes);
 app.use("/api/v1/upload", upload.any(), uploadRoutes);
-app.use('/api/v1/chat',chatRoutes)
-app.use('/api/v1/assessment', assessmentRoutes)
+app.use("/api/v1/chat", chatRoutes);
+app.use("/api/v1/assessment", assessmentRoutes);
+app.use("/api/v1/payment", paymentRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandling);
 
-const server = createServer(app)
+const server = createServer(app);
 
-setupSocket(server)
+setupSocket(server);
 
- server.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);
 });
