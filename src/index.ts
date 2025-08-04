@@ -29,7 +29,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: config.FRONTEND_URL,
+    origin: [config.FRONTEND_URL, "https://mentoonsmythos.com"],
     credentials: true,
   })
 );
