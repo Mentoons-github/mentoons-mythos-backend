@@ -1,11 +1,12 @@
 import { Server, Socket } from "socket.io";
 import Chat from "../models/chatModel";
 import User from "../models/userModel";
+import config from "../config/config";
 
 export const setupSocket = (server: any) => {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: config.FRONTEND_URL,
       credentials: true,
     },
   });
@@ -43,7 +44,7 @@ export const setupSocket = (server: any) => {
 
         const chat = await Chat.create({
           group: groupId,
-          sender: senderId, 
+          sender: senderId,
           message,
         });
 
