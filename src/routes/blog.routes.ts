@@ -10,6 +10,7 @@ import {
   fetchUserBlogs,
   increaseViewsCount,
   fetchBlogByViews,
+  searchBlogs,
 } from "../controllers/blogController";
 import userAuth from "../middlewares/authMiddleware";
 
@@ -25,6 +26,7 @@ routes.post("/comments/:commentId/reply", userAuth, replyComment);
 routes.get("/:blogId/comment/get-comments", userAuth, getComments);
 routes.patch('/:blogId/views', userAuth, increaseViewsCount)
 routes.get("/most-read", fetchBlogByViews)
+routes.get('/search', searchBlogs)
 
 
 

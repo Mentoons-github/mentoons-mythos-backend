@@ -10,4 +10,7 @@ export interface IBlog {
     likes?: mongoose.Types.ObjectId[];
     commentsOff:boolean;
     viewers:mongoose.Types.ObjectId[]
+    searchTitle:string,
+    searchWriter:string,
+    searchTags:string[]
 }
