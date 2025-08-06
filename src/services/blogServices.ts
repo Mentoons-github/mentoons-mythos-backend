@@ -6,6 +6,7 @@ import CustomError from "../utils/customError";
 import { IComment } from "../interfaces/commentInterface";
 import Comment from "../models/commentModel";
 
+//create blog
 export const createBlog = async (data: IBlog, userId: string) => {
   const user = await User.findById(userId).select("firstName lastName");
   const blog = await Blog.create({
@@ -22,6 +23,7 @@ export const createBlog = async (data: IBlog, userId: string) => {
   return blog;
 };
 
+//fetch blog
 export const fetchBlog = async (skip: number = 0, limit: number = 10) => {
   const blogs = await Blog.find()
     .sort({ createdAt: -1 })
@@ -33,16 +35,20 @@ export const fetchBlog = async (skip: number = 0, limit: number = 10) => {
   return { blogs, total };
 };
 
+//fetch single blog
 export const fetchSingleBlog = async (blogId: string) => {
   const blog = await Blog.findById(blogId);
   return blog;
 };
 
+//user blog
 export const userBlog = async (userId: string) => {
   const blogs = await Blog.find({ writerId: userId });
   console.log("blogs data :", blogs);
   return blogs;
 };
+
+//like blog
 export const likeBlog = async (blogId: string, userId: string) => {
   const blog = await Blog.findById(blogId);
   if (!blog) throw new CustomError("Blog not found", 404);
@@ -56,6 +62,7 @@ export const likeBlog = async (blogId: string, userId: string) => {
   return blog;
 };
 
+//comment blog
 export const addComment = async (
   blogId: string,
   userId: string,
@@ -79,6 +86,7 @@ export const addComment = async (
   return newComment;
 };
 
+//reply comment
 export const replyComment = async (
   commentId: string,
   userId: string,
@@ -101,11 +109,13 @@ export const replyComment = async (
   );
 };
 
+//get comments
 export const getComments = async (blogId: string) => {
   const blog = await Comment.find({ blogId }).sort({ createdAt: -1 });
   return blog;
 };
 
+//increase view count
 export const increaseViewsCount = async (blogId: string, userId: string) => {
   const blog = await Blog.findById(blogId);
 
@@ -126,6 +136,7 @@ export const increaseViewsCount = async (blogId: string, userId: string) => {
   return blog.viewers.length;
 };
 
+//fetch blog by views
 export const fetchBlogByViews = async () => {
   const blogs = await Blog.aggregate([
     {
@@ -135,7 +146,7 @@ export const fetchBlogByViews = async () => {
     },
     {
       $lookup: {
-        from: "comments",          
+        from: "comments",
         localField: "_id",
         foreignField: "blogId",
         as: "blogComments",
@@ -161,3 +172,18 @@ export const fetchBlogByViews = async () => {
   return blogs;
 };
 
+//serch blogs
+export const searchBlogs = async (query: string) => {
+  const sanitizedKeyword = query.replace(/[\s-_]/g, "").toLowerCase();
+  const regex = new RegExp(sanitizedKeyword, "i");
+
+  const blogs = await Blog.find({
+    $or: [
+      { searchTitle: regex },
+      { searchWriter: regex },
+      { searchTags: regex },
+    ],
+  }).select("title writer tags");
+
+  return blogs;
+};
