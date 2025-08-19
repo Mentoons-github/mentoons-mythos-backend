@@ -5,15 +5,37 @@ export interface IUser {
   password: string;
   dateOfBirth?: Date;
   timeOfBirth: string;
-  profilePicture?:string
+  profilePicture?: string;
   about?: string;
   country?: string;
   isGoogleUser?: boolean;
   longitude: string;
   latitude: string;
   astrologyDetail?: IAstrologyDetail;
-  isBlocked:boolean;
-  role:string
+  astrologyReports?: AstroReport;
+  isBlocked: boolean;
+  role: string;
+}
+
+export interface AstroReport {
+  sun?: AstroSchema | null;
+  moon?: AstroSchema | null;
+}
+
+export interface AstroSchema {
+  report?: Record<string, any>;
+  nakshatra?: Record<string, any>;
+  zodiac?: string;
+  lastGenerated?: Date;
+  rasi: {
+    id: number;
+    name: string;
+    lord: {
+      id: number;
+      name: string;
+      vedic_name: string;
+    };
+  };
 }
 
 export interface IAstrologyDetail {

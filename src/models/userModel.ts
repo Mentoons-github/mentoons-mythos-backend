@@ -3,6 +3,49 @@ import { IUser } from "../interfaces/userInterface";
 
 export interface IUserDocument extends IUser, Document {}
 
+const astroSchema = new mongoose.Schema(
+  {
+    report: {
+      deity: { type: String },
+      ganam: { type: String },
+      symbol: { type: String },
+      animal_sign: { type: String },
+      nadi: { type: String },
+      color: { type: String },
+      best_direction: { type: String },
+      syllables: { type: String },
+      birth_stone: { type: String },
+      gender: { type: String },
+      planet: { type: String },
+      enemy_yoni: { type: String },
+    },
+    nakshatra: {
+      id: { type: Number },
+      name: { type: String },
+      pada: { type: Number },
+      lord: {
+        id: { type: Number },
+        name: { type: String },
+        vedic_name: { type: String },
+      },
+    },
+    zodiac: {
+      type: String,
+    },
+    rasi: {
+      id: { type: Number },
+      name: { type: String },
+      lord: {
+        id: { type: Number },
+        name: { type: String },
+        vedic_name: { type: String },
+      },
+    },
+    lastGenerated: { type: Date },
+  },
+  { _id: false }
+);
+
 const userSchema = new mongoose.Schema({
   firstName: {
     type: String,
@@ -62,14 +105,18 @@ const userSchema = new mongoose.Schema({
       type: String,
     },
   },
-  isBlocked:{
-    type:Boolean,
-    default:false
+  astrologyReports: {
+    moon: { type: astroSchema, default: null },
+    sun: { type: astroSchema, default: null },
   },
-  role:{
-    type:String,
-    default:"user"
-  }
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+  role: {
+    type: String,
+    default: "user",
+  },
 });
 const User = mongoose.model<IUserDocument>("User", userSchema);
 

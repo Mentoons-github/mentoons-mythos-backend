@@ -9,6 +9,7 @@ import {
   accessTokenGenerator,
   logout,
   forgotPassword,
+  changePassword,
 } from "../controllers/authController";
 import userAuth from "../middlewares/authMiddleware";
 import passport from "passport";
@@ -18,11 +19,12 @@ const router = express.Router();
 
 router.post("/register", registerUser);
 router.post("/login", loginUser);
-router.get("/get-access-token",accessTokenGenerator)
+router.get("/get-access-token", accessTokenGenerator);
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtpHandler);
-router.post("/forgot-password",forgotPassword)
-router.post('/logout',logout)
+router.post("/forgot-password", forgotPassword);
+router.put("/change-password", userAuth, changePassword);
+router.post("/logout", logout);
 router.get("/user", userAuth, getUsers);
 router.get(
   "/google",

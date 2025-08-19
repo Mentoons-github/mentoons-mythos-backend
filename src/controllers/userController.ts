@@ -1,3 +1,4 @@
+import User from "../models/userModel";
 import {
   getAstroAccessToken,
   getSunAndMoonSign,
@@ -14,85 +15,107 @@ export const fetchUser = catchAsync(async (req, res) => {
   });
 });
 
-export const fetchAllUsers = catchAsync(async(req,res) => {
-  const users = await userService.fetchAllUsers()
+export const fetchAllUsers = catchAsync(async (req, res) => {
+  const users = await userService.fetchAllUsers();
   res.status(200).json({
-    success:true,
-    users
-  })
-})
+    success: true,
+    users,
+  });
+});
 
-export const blockUser = catchAsync(async(req,res) => {
-  const {userId} = req.params
-  const currentUserId = req.user._id
-  const updatedUser = await userService.blockUser(userId, currentUserId)
+export const blockUser = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const currentUserId = req.user._id;
+  const updatedUser = await userService.blockUser(userId, currentUserId);
 
   res.status(200).json({
-    success:true,
-    message: updatedUser?.isBlocked ? "User has been blocked" : "User has been unblocked",
-    user:updatedUser
-  })
-})
+    success: true,
+    message: updatedUser?.isBlocked
+      ? "User has been blocked"
+      : "User has been unblocked",
+    user: updatedUser,
+  });
+});
 
+//update user
 export const updateUser = catchAsync(async (req, res) => {
   const { data: details } = req.body;
-
   const userId = req.user._id;
-  let updatedUser = await userService.UserUpdate({ details, userId });
 
-  const user = updatedUser.user;
+  let user = await userService.userExist(userId);
 
-  if (
+  const oldDob = user.dateOfBirth?.toString();
+  const oldTob = user.timeOfBirth;
+  const oldLat = user.latitude;
+  const oldLong = user.longitude;
+
+  const updatedUser = await userService.UserUpdate({ details, userId });
+  user = updatedUser.user!;
+
+  const dobChanged =
+    details.dateOfBirth && details.dateOfBirth.toString() !== oldDob;
+  const tobChanged = details.timeOfBirth && details.timeOfBirth !== oldTob;
+  const latChanged = details.latitude && details.latitude !== oldLat;
+  const longChanged = details.longitude && details.longitude !== oldLong;
+
+  const rashiMissing =
+    !user.astrologyDetail?.sunSign || !user.astrologyDetail?.moonSign;
+
+  const shouldRecalculateRashi =
+    (dobChanged || tobChanged || latChanged || longChanged || rashiMissing) &&
     user.dateOfBirth &&
     user.timeOfBirth &&
     user.latitude &&
-    user.longitude &&
-    !user.astrologyDetail?.sunSign &&
-    !user.astrologyDetail?.moonSign
-  ) {
-    const date = new Date(user.dateOfBirth).toISOString().split("T")[0];
+    user.longitude;
+
+  if (shouldRecalculateRashi) {
+    const date = new Date(user.dateOfBirth!).toISOString().split("T")[0];
     const datetime = `${date}T${user.timeOfBirth}:00+05:30`;
-    console.log("Formatted datetime for UserUpdate:", datetime);
 
     const latitude = Number(user.latitude);
     const longitude = Number(user.longitude);
 
-    if (isNaN(latitude) || isNaN(longitude)) {
-      throw new Error("Invalid coordinates");
-    }
-    if (
-      !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}$/.test(datetime)
-    ) {
-      throw new Error("Invalid datetime format");
-    }
-
     const token = await getAstroAccessToken();
-    console.log("token :", token);
+    const { sunSign, moonSign, report, nakshatra, zodiac } =
+      await getSunAndMoonSign({
+        datetime,
+        latitude,
+        longitude,
+        token,
+      });
 
-    const { sunSign, moonSign } = await getSunAndMoonSign({
-      datetime,
-      latitude,
-      longitude,
-      token,
-    });
+    const moonReportData = {
+      report,
+      nakshatra,
+      zodiac,
+      rasi: moonSign,
+      lastGenerated: new Date(),
+    };
 
-    console.log("sun sign :", sunSign, "moon sign :", moonSign);
+    const sunReportData = {
+      report,
+      nakshatra,
+      zodiac,
+      rasi: sunSign,
+      lastGenerated: new Date(),
+    };
 
-    updatedUser = await userService.UserUpdate({
-      userId,
-      details: {
-        astrologyDetail: {
-          sunSign,
-          moonSign,
+    user = (
+      await userService.UserUpdate({
+        userId,
+        details: {
+          astrologyDetail: { sunSign: sunSign.name, moonSign: moonSign.name },
+          astrologyReports: {
+            moon: moonReportData,
+            sun: sunReportData,
+          },
         },
-      },
-    });
+      })
+    ).user!;
   }
 
-  console.log("updated user :", updatedUser);
-
   return res.status(200).json({
-    user: updatedUser.user,
+    user,
     message: updatedUser.message,
     success: true,
   });
@@ -100,14 +123,14 @@ export const updateUser = catchAsync(async (req, res) => {
 
 export const reportUser = catchAsync(async (req, res) => {
   const reportedBy = req.user._id;
-  const { userId  } = req.params;
+  const { userId } = req.params;
   const { reason, from, fromId } = req.body;
   const report = await userService.reportUser({
     reportedBy,
     userId,
     fromId,
     reason,
-    from
+    from,
   });
 
   res.status(201).json({ message: "Report Submitted", report });
