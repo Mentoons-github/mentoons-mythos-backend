@@ -21,6 +21,7 @@ import astrologyRoutes from "./routes/astrology.routes";
 import chatRoutes from "./routes/chat.routes";
 import assessmentRoutes from "./routes/assessment.route";
 import paymentRoutes from "./routes/payment.routes";
+import careerRoutes from './routes/career.route'
 
 const app = express();
 app.use(morgan("dev"));
@@ -57,6 +58,7 @@ app.use("/api/v1/upload", upload.any(), uploadRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/assessment", assessmentRoutes);
 app.use("/api/v1/payment", paymentRoutes);
+app.use("/api/v1/career", careerRoutes)
 
 app.use(notFoundHandler);
 app.use(globalErrorHandling);
