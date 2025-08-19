@@ -22,6 +22,9 @@ import chatRoutes from "./routes/chat.routes";
 import assessmentRoutes from "./routes/assessment.route";
 import paymentRoutes from "./routes/payment.routes";
 
+//employee router
+import employeeRoutes from "./routes/employee.routes";
+
 const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
@@ -57,6 +60,9 @@ app.use("/api/v1/upload", upload.any(), uploadRoutes);
 app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/assessment", assessmentRoutes);
 app.use("/api/v1/payment", paymentRoutes);
+
+//employee
+app.use("/api/v1/employee", employeeRoutes);
 
 app.use(notFoundHandler);
 app.use(globalErrorHandling);

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vedic Astrology Report</title>
+    <style>
+      body {
+        font-family: Arial, serif;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+      }
+      .container {
+        max-width: 750px; /* Slightly reduced to fit A4 */
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .header {
+        background: linear-gradient(to right, #343a40, #495057, #6c757d);
+        padding: 1rem; /* Reduced padding */
+        color: white;
+        position: relative;
+        overflow: hidden;
+      }
+      .logo {
+        position: absolute;
+        top: 0.5rem; /* Reduced top position */
+        left: 0.5rem;
+        width: 48px; /* Smaller logo */
+        height: 48px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(4px);
+      }
+      .logo img {
+        width: 32px; /* Smaller logo image */
+        height: 32px;
+      }
+      .header-content {
+        text-align: center;
+        padding-top: 0.5rem; /* Reduced padding */
+      }
+      .header h1 {
+        font-size: 1.8rem; /* Smaller font */
+        font-weight: bold;
+        margin-bottom: 0.3rem;
+      }
+      .header p {
+        font-size: 1rem; /* Smaller font */
+        opacity: 0.9;
+      }
+      .date-box {
+        margin-top: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 0.3rem 0.8rem; /* Reduced padding */
+        border-radius: 9999px;
+        display: inline-block;
+        backdrop-filter: blur(4px);
+      }
+      .date-box span {
+        font-size: 0.75rem; /* Smaller font */
+      }
+      .star {
+        position: absolute;
+        opacity: 0.3;
+      }
+      .star-1 {
+        top: 1rem;
+        right: 1rem;
+        width: 20px;
+        height: 20px;
+      }
+      .star-2 {
+        bottom: 1rem;
+        left: 4rem;
+        width: 14px;
+        height: 14px;
+      }
+      .star-3 {
+        top: 2rem;
+        right: 5rem;
+        width: 10px;
+        height: 10px;
+      }
+      .main-content {
+        padding: 1rem; /* Reduced padding */
+      }
+      .section {
+        margin-bottom: 1rem; /* Reduced margin */
+      }
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem; /* Reduced gap */
+      }
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem; /* Reduced gap */
+      }
+      .card {
+        padding: 1rem; /* Reduced padding */
+        border-radius: 0.5rem;
+        border-left: 3px solid;
+      }
+      .moon-card {
+        background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+        border-color: #495057;
+      }
+      .nakshatra-card {
+        background: linear-gradient(to right, #f8f9fa, #e9ecef);
+        border: 1px solid #dee2e6;
+        padding: 1rem; /* Reduced padding */
+      }
+      .card h2,
+      .nakshatra-card h2 {
+        font-size: 1.2rem; /* Smaller font */
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+      .nakshatra-card h3 {
+        font-size: 1rem; /* Smaller font */
+        font-weight: bold;
+        color: #343a40;
+        margin-bottom: 0.3rem;
+      }
+      .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.5rem; /* Reduced margin */
+        font-size: 0.85rem; /* Smaller font */
+      }
+      .info-row span:first-child {
+        font-weight: 600;
+        color: #4b5563;
+      }
+      .info-row span:last-child {
+        color: #1f2937;
+      }
+      .symbol-box {
+        background: rgba(255, 255, 255, 0.5);
+        padding: 0.75rem; /* Reduced padding */
+        border-radius: 0.3rem;
+      }
+      .symbol-box h4 {
+        font-size: 0.9rem; /* Smaller font */
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+      .symbol-box p {
+        font-size: 0.8rem; /* Smaller font */
+        color: #4b5563;
+      }
+      .attribute-card {
+        padding: 1rem; /* Reduced padding */
+        border-radius: 0.3rem;
+        border: 1px solid #dee2e6;
+      }
+      .birth-stone-card,
+      .color-card,
+      .direction-card {
+        background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+      }
+      .attribute-card h3 {
+        font-size: 0.9rem; /* Smaller font */
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+      .attribute-card p {
+        font-size: 1.2rem; /* Smaller font */
+        font-weight: bold;
+        color: #343a40;
+      }
+      .details-card,
+      .compatibility-card {
+        padding: 1rem; /* Reduced padding */
+        border-radius: 0.5rem;
+        background: linear-gradient(to bottom right, #f8f9fa, #e9ecef);
+      }
+      .details-card h3,
+      .compatibility-card h3 {
+        font-size: 1rem; /* Smaller font */
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+      }
+      .details-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.3rem 0; /* Reduced padding */
+        border-bottom: 1px solid #dee2e6;
+        font-size: 0.85rem; /* Smaller font */
+      }
+      .details-row:last-child {
+        border-bottom: none;
+      }
+      .syllables {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.3rem; /* Reduced gap */
+      }
+      .syllable {
+        background: #e9ecef;
+        color: #343a40;
+        padding: 0.2rem 0.5rem; /* Reduced padding */
+        border-radius: 9999px;
+        font-size: 0.75rem; /* Smaller font */
+        font-weight: 500;
+      }
+      .compatibility-card h4 {
+        font-size: 0.9rem; /* Smaller font */
+        font-weight: 600;
+        color: #4b5563;
+        margin-bottom: 0.3rem;
+      }
+      .compatibility-card span {
+        font-size: 0.9rem; /* Smaller font */
+        font-weight: bold;
+        color: #343a40;
+      }
+      .footer {
+        padding: 1rem; /* Reduced padding */
+        background: linear-gradient(to right, #f8f9fa, #e9ecef);
+        border: 1px solid #dee2e6;
+        border-radius: 0.3rem;
+        text-align: center;
+        color: #4b5563;
+        font-size: 0.75rem; /* Smaller font */
+        line-height: 1.2; /* Tighter line height */
+      }
+      @media print {
+        @page {
+          size: A4;
+          margin: 0.3in; /* Reduced margin */
+        }
+        .container {
+          box-shadow: none;
+          max-width: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Header Section -->
+      <div class="header">
+        <div class="logo">
+          <img
+            src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMiIvPgo8cGF0aCBkPSJNMjAgNEwyMS41IDE4SDIwSDE4LjVMMjAgNFoiIGZpbGw9IndoaXRlIi8+CjxjaXJjbGUgY3g9IjIwIiBjeT0iMjAiIHI9IjMiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0zMCAyMEwyOC41IDM0SDMwSDMxLjVMMzAgMjBaIiBmaWxsPSJ3aGl0ZSIvPgo8cGF0aCBkPSJNMTAgMjBMMTEuNSA2SDEwSDguNUwxMCAyMFoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo="
+            alt="Astrology Logo"
+          />
+        </div>
+        <div class="header-content">
+          <h1>Vedic Astrology Report</h1>
+          <p>Complete Astrological Analysis</p>
+          <div class="date-box">
+            <span>Generated on {{generated_date}}</span>
+          </div>
+        </div>
+        <svg
+          class="star star-1"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+          />
+        </svg>
+        <svg
+          class="star star-2"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+          />
+        </svg>
+        <svg
+          class="star star-3"
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <polygon
+            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+          />
+        </svg>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Core Signs Section -->
+        <div class="section">
+          <div class="card moon-card">
+            <h2>
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#495057"
+                stroke-width="2"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+              &nbsp;{{rasi_name}}
+            </h2>
+            <div class="info-row">
+              <span>Lord:</span>
+              <span>{{lord_name}} ({{lord_vedic_name}})</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Nakshatra Section -->
+        <div class="section nakshatra-card">
+          <h2>
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#495057"
+              stroke-width="2"
+            >
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
+            &nbsp;Nakshatra
+          </h2>
+          <p style="color: #4b5563; font-size: 0.8rem">Your Birth Star</p>
+          <div class="grid-2">
+            <div>
+              <h3>{{nakshatra_name}}</h3>
+              <div class="info-row">
+                <span>Pada:</span>
+                <span>{{nakshatra_pada}}</span>
+              </div>
+              <div class="info-row">
+                <span>Lord:</span>
+                <span
+                  >{{nakshatra_lord_name}} ({{nakshatra_lord_vedic_name}})</span
+                >
+              </div>
+              <div class="info-row">
+                <span>Deity:</span>
+                <span>{{deity}}</span>
+              </div>
+            </div>
+            <div class="symbol-box">
+              <h4>Symbol & Meaning</h4>
+              <p><strong>Symbol:</strong> {{symbol}}</p>
+              <p><strong>Animal Sign:</strong> {{animal_sign}}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personal Attributes -->
+        <div class="section grid-3">
+          <div class="attribute-card birth-stone-card">
+            <h3>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6c757d"
+                stroke-width="2"
+              >
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+              &nbsp;Birth Stone
+            </h3>
+            <p>{{birth_stone}}</p>
+          </div>
+          <div class="attribute-card color-card">
+            <h3>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#495057"
+                stroke-width="2"
+              >
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              &nbsp;Lucky Color
+            </h3>
+            <p>{{color}}</p>
+          </div>
+          <div class="attribute-card direction-card">
+            <h3>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6c757d"
+                stroke-width="2"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <path
+                  d="M12 2v4M12 18v4M2 12h4M18 12h4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"
+                />
+              </svg>
+              &nbsp;Best Direction
+            </h3>
+            <p>{{best_direction}}</p>
+          </div>
+        </div>
+
+        <!-- Detailed Information -->
+        <div class="section grid-2">
+          <!-- Astrological Details -->
+          <div class="details-card">
+            <h3>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#495057"
+                stroke-width="2"
+              >
+                <path
+                  d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z"
+                />
+                <path
+                  d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12v7h3.5a3.5 3.5 0 1 1 0 7H12v-7H8.5a3.5 3.5 0 1 1 0-7H12v-7z"
+                />
+              </svg>
+              &nbsp;Astrological Details
+            </h3>
+            <div class="details-row">
+              <span>Ganam:</span>
+              <span>{{ganam}}</span>
+            </div>
+            <div class="details-row">
+              <span>Nadi:</span>
+              <span>{{nadi}}</span>
+            </div>
+            <div class="details-row">
+              <span>Gender:</span>
+              <span>{{gender}}</span>
+            </div>
+            <div class="details-row">
+              <span>Ruling Planet:</span>
+              <span>{{planet}}</span>
+            </div>
+            <div class="details-row">
+              <span>Enemy Yoni:</span>
+              <span>{{enemy_yoni}}</span>
+            </div>
+          </div>
+
+          <!-- Compatibility & Sounds -->
+          <div class="compatibility-card">
+            <h3>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#6c757d"
+                stroke-width="2"
+              >
+                <path
+                  d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"
+                />
+              </svg>
+              &nbsp;Compatibility & Sounds
+            </h3>
+            <div>
+              <h4>Lucky Syllables:</h4>
+              <div class="syllables">{{{syllables_html}}}</div>
+            </div>
+            <div style="margin-top: 0.5rem">
+              <h4>Western Zodiac:</h4>
+              <span>{{zodiac_name}}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer">
+          <p>
+            This Vedic astrology report is based on ancient Indian astrological
+            principles to guide self-reflection and personal growth.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
