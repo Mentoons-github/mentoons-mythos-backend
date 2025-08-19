@@ -6,7 +6,7 @@ export const applyCareer = async(datas:ICareer) => {
     console.log(datas)
     const {name, email, mobileNumber, resume, position} = datas
 
-    const alreadyApplied =await Career.findOne({email})
+    const alreadyApplied =await Career.findOne({email, position})
     if(alreadyApplied) {
         throw new CustomError("You already applied for this job",400)
     }
