@@ -1,6 +1,7 @@
 import axios from "axios";
 import config from "../config/config";
 import CustomError from "../utils/customError";
+import User from "../models/userModel";
 
 interface GetSignParams {
   datetime: string;
@@ -9,14 +10,35 @@ interface GetSignParams {
   token: string;
 }
 
+interface Rasi {
+  id: number;
+  name: string;
+  lord: {
+    id: number;
+    name: string;
+    vedic_name: string;
+  };
+}
+
+interface Nakshatra {
+  id: number;
+  name: string;
+  lord: { id: number; name: string; vedic_name: string };
+  pada: number;
+}
+
 interface SignResponse {
-  sunSign: string;
-  moonSign: string;
+  sunSign: Rasi;
+  moonSign: Rasi;
+  report: any;
+  nakshatra: Nakshatra;
+  zodiac: string;
 }
 
 let token = "";
 let expiresAt = 0;
 
+//get rashi accessToken
 export const getAstroAccessToken = async () => {
   if (token && Date.now() < expiresAt) return token;
 
@@ -35,16 +57,13 @@ export const getAstroAccessToken = async () => {
   return token;
 };
 
+//get rashi
 export const getSunAndMoonSign = async ({
   datetime,
   latitude,
   longitude,
   token,
 }: GetSignParams): Promise<SignResponse> => {
-  try {
-  } catch (error) {
-    console.log(error);
-  }
   const headers = {
     Authorization: `Bearer ${token}`,
   };
@@ -55,7 +74,6 @@ export const getSunAndMoonSign = async ({
     );
   }
 
-  // Validate latitude and longitude
   if (isNaN(latitude) || isNaN(longitude)) {
     throw new Error("Invalid coordinates");
   }
@@ -66,6 +84,11 @@ export const getSunAndMoonSign = async ({
   console.log("Prokerala API URL:", url);
 
   const response = await axios.get(url, { headers });
+
+  console.log(
+    "response from prokerala api : ",
+    response.data.data.nakshatra_details
+  );
 
   const nakshatraDetails = response.data.data.nakshatra_details;
   if (
@@ -79,7 +102,22 @@ export const getSunAndMoonSign = async ({
   }
 
   return {
-    sunSign: nakshatraDetails.soorya_rasi.name,
-    moonSign: nakshatraDetails.chandra_rasi.name,
+    sunSign: nakshatraDetails.soorya_rasi,
+    moonSign: nakshatraDetails.chandra_rasi,
+    report: nakshatraDetails.additional_info,
+    nakshatra: nakshatraDetails.nakshatra,
+    zodiac: nakshatraDetails.zodiac.name,
   };
+};
+
+export const userHasRashi = async (userId: string): Promise<boolean> => {
+  const hasRashi = await User.findOne({
+    _id: userId,
+    $or: [
+      { "astrologyDetail.moonSign": { $exists: true, $ne: null } },
+      { "astrologyDetail.sunSign": { $exists: true, $ne: null } },
+    ],
+  });
+
+  return Boolean(hasRashi);
 };

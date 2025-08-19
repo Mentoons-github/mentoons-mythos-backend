@@ -2,6 +2,7 @@ import User from "../models/userModel";
 import CustomError from "../utils/customError";
 import { IUser } from "../interfaces/userInterface";
 import Report from "../models/ReportModel";
+import _ from "lodash";
 
 //fetch all users
 export const fetchAllUsers = async () => {
@@ -35,13 +36,33 @@ export const UserUpdate = async ({
   details: Partial<IUser>;
   userId: string;
 }) => {
-  const user = await User.findByIdAndUpdate(userId, details, { new: true });
+  const user = await User.findById(userId).lean();
 
   if (!user) {
-    throw new CustomError("User updation failed", 404);
+    throw new CustomError("User not found", 404);
   }
 
-  return { user, message: "User updated successfully" };
+  const updates: Partial<IUser> = {};
+
+  for (const key of Object.keys(details)) {
+    const dbValue = _.get(user, key);
+    const newValue = _.get(details, key);
+
+    if (!_.isEqual(dbValue, newValue)) {
+      _.set(updates, key, newValue);
+    }
+  }
+
+  if (_.isEmpty(updates)) {
+    throw new CustomError("No changes detected", 409);
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(userId, updates, {
+    new: true,
+    runValidators: true,
+  });
+
+  return { user: updatedUser!, message: "User updated successfully" };
 };
 
 //report user
@@ -84,4 +105,13 @@ export const reportUser = async ({
   });
 
   return report;
+};
+
+//check user exists
+export const userExist = async (userId: string) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new CustomError("No user found", 404);
+  }
+  return user;
 };
