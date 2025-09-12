@@ -42,9 +42,7 @@
     "passport-google-oauth20": "^2.0.0",
     "puppeteer": "^24.16.1",
     "socket.io": "^4.8.1",
-    "uuid": "^11.1.0"
-  },
-  "devDependencies": {
+    "uuid": "^11.1.0",
     "@types/bcrypt": "^5.0.2",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
@@ -54,9 +52,11 @@
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.0.10",
-    "@types/nodemailer": "^6.4.17",
+    "@types/nodemailer": "^6.4.19",
     "@types/passport": "^1.0.17",
-    "@types/passport-google-oauth20": "^2.0.16",
+    "@types/passport-google-oauth20": "^2.0.16"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
