@@ -43,8 +43,8 @@ export const sendAccessToken = (
 ): void => {
   res.cookie(cookieName, token, {
     httpOnly: true,
-    secure: config.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 15 * 60 * 1000,
   });
 };
@@ -56,8 +56,8 @@ export const sendRefreshToken = (
 ): void => {
   res.cookie(cookieName, token, {
     httpOnly: true,
-    secure: config.NODE_ENV === "production",
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 };
