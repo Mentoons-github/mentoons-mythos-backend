@@ -16,12 +16,23 @@ export const fetchUser = catchAsync(async (req, res) => {
 });
 
 export const fetchAllUsers = catchAsync(async (req, res) => {
-  const users = await userService.fetchAllUsers();
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 0;
+  const sort = (req.query.sort as "newest" | "oldest") || "newest";
+  const search = (req.query.search as string) || "";
+
+  const users = await userService.fetchAllUsers(page, limit, sort, search);
   res.status(200).json({
     success: true,
-    users,
+    ...users,
   });
 });
+
+//fetch user count
+export const fetchUserCount = catchAsync(async(req,res) => {
+  const count = await userService.fetchUserCount()
+  res.status(200).json({message:"count fetched", count})
+})
 
 export const blockUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
@@ -121,6 +132,7 @@ export const updateUser = catchAsync(async (req, res) => {
   });
 });
 
+//report user
 export const reportUser = catchAsync(async (req, res) => {
   const reportedBy = req.user._id;
   const { userId } = req.params;
@@ -134,4 +146,10 @@ export const reportUser = catchAsync(async (req, res) => {
   });
 
   res.status(201).json({ message: "Report Submitted", report });
+});
+
+//fetch single user data
+export const fetchSingleUser = catchAsync(async (req, res) => {
+  const user = await userService.fetchSingleUser(req.params.userId);
+  res.status(200).json({ message: "User Fetched successfull", user });
 });

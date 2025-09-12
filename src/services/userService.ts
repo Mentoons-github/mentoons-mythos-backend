@@ -3,12 +3,48 @@ import CustomError from "../utils/customError";
 import { IUser } from "../interfaces/userInterface";
 import Report from "../models/ReportModel";
 import _ from "lodash";
+import Blog from "../models/blogModel";
 
 //fetch all users
-export const fetchAllUsers = async () => {
-  const user = await User.find();
-  return user;
+export const fetchAllUsers = async (
+  page: number,
+  limit: number,
+  sort: "newest" | "oldest" = "newest",
+  search?: string
+) => {
+  const skip = (page - 1) * limit;
+  const query: any = {};
+
+  if (search) {
+    query.$or = [
+      { firstName: { $regex: search, $options: "i" } },
+      { lastName: { $regex: search, $options: "i" } },
+      { email: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const sortOrder = sort === "newest" ? -1 : 1;
+
+  const total = await User.countDocuments(query);
+
+  const users = await User.find(query)
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: sortOrder });
+
+  return {
+    users,
+    page,
+    total,
+    totalPage: Math.ceil(total / limit),
+  };
 };
+
+//fetch user count 
+export const fetchUserCount = async() => {
+  const user = await User.find()
+  return user.length
+}
 
 //block user
 export const blockUser = async (userId: string, currentUserId: string) => {
@@ -114,4 +150,19 @@ export const userExist = async (userId: string) => {
     throw new CustomError("No user found", 404);
   }
   return user;
+};
+
+//fetch single user
+export const fetchSingleUser = async (userId: string) => {
+  const user = await User.findById(userId);
+  const blog = await Blog.find({ writerId: userId });
+  if (!user) {
+    throw new CustomError("No user found", 404);
+  }
+  const userWithBlog = {
+    ...user.toObject(),
+    blogs: blog || [],
+  };
+
+  return userWithBlog;
 };

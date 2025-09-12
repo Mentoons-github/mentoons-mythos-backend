@@ -5,6 +5,7 @@ import User from "../models/userModel";
 import CustomError from "../utils/customError";
 import { IComment } from "../interfaces/commentInterface";
 import Comment from "../models/commentModel";
+import Report from "../models/ReportModel";
 
 //create blog
 export const createBlog = async (data: IBlog, userId: string) => {
@@ -24,21 +25,54 @@ export const createBlog = async (data: IBlog, userId: string) => {
 };
 
 //fetch blog
-export const fetchBlog = async (skip: number = 0, limit: number = 10) => {
-  const blogs = await Blog.find()
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limit);
+export const fetchBlog = async (
+  skip: number,
+  limit: number,
+  sort: string,
+  search?: string
+) => {
+  const query: any = {};
+  if (search) {
+    query.$or = [
+      { writer: { $regex: search, $options: "i" } },
+      { title: { $regex: search, $options: "i" } },
+      { tags: { $regex: search, $options: "i" } },
+    ];
+  }
 
-  const total = await Blog.countDocuments();
+  const sortOrder = sort === "newest" ? -1 : 1;
+  const blogs = await Blog.find(query)
+    .skip(skip)
+    .limit(limit)
+    .sort({ createdAt: sortOrder });
+
+  const total = await Blog.countDocuments(query);
 
   return { blogs, total };
 };
 
+//fetch total blogs
+export const fetchBlogCount = async () => {
+  const blogs = await Blog.find()
+  return blogs.length
+}
+
 //fetch single blog
 export const fetchSingleBlog = async (blogId: string) => {
   const blog = await Blog.findById(blogId);
-  return blog;
+  if (!blog) throw new Error("Blog not found");
+
+  const reports = await Report.find({ fromId: blogId });
+
+  const updatedBlog = {
+    ...blog.toObject(),
+    reportLength: reports.length,
+  };
+
+  return {
+    blog: updatedBlog,
+    reports,
+  };
 };
 
 //user blog
@@ -79,14 +113,13 @@ export const addComment = async (
 
   await Blog.findByIdAndUpdate(
     blogId,
-    { $inc: { commentsCount: 1 } },
+    { $inc: { commentCount: 1 } },
     { new: true }
   );
 
   return newComment;
 };
 
-//reply comment
 export const replyComment = async (
   commentId: string,
   userId: string,
@@ -111,8 +144,39 @@ export const replyComment = async (
 
 //get comments
 export const getComments = async (blogId: string) => {
-  const blog = await Comment.find({ blogId }).sort({ createdAt: -1 });
-  return blog;
+  const comments = await Comment.find({ blogId }).sort({ createdAt: -1 });
+
+  const reports = await Report.aggregate([
+    { $match: { commentId: { $ne: null } } },
+    { $group: { _id: "$commentId", count: { $sum: 1 } } },
+  ]);
+
+  const reportMap = reports.reduce((acc: Record<string, number>, r) => {
+    acc[r._id.toString()] = r.count;
+    return acc;
+  }, {});
+
+  const updatedComments = comments.map((comment) => ({
+    ...comment.toObject(),
+    reportLength: reportMap[comment._id.toString()] || 0,
+  }));
+
+  return updatedComments;
+};
+
+//delete comment
+export const deleteComment = async (commentId: string) => {
+  const comment = await Comment.findById(commentId);
+  if (!comment) throw new CustomError("Comment not found", 400);
+
+  await Comment.findByIdAndDelete(commentId);
+
+  await Blog.findByIdAndUpdate(
+    comment.blogId,
+    { $inc: { commentCount: -1 } },
+    { new: true }
+  );
+  return { message: "Comment deleted successfully" };
 };
 
 //increase view count
@@ -186,4 +250,11 @@ export const searchBlogs = async (query: string) => {
   }).select("title writer tags");
 
   return blogs;
+};
+
+//deleteBlog
+export const deleteBlog = async (blogId: string) => {
+  const deletedBlog = await Blog.findByIdAndDelete(blogId);
+  if (!deletedBlog) throw new CustomError("Blog not found", 400);
+  return blogId;
 };

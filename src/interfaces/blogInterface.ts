@@ -12,5 +12,6 @@ export interface IBlog {
     viewers:mongoose.Types.ObjectId[]
     searchTitle:string,
     searchWriter:string,
-    searchTags:string[]
+    searchTags:string[],
+    commentCount:number
 }
