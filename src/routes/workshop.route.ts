@@ -17,7 +17,7 @@ import {
 const routes = express.Router();
 
 routes.post("/add-new", userAuth, addWorkshop);
-routes.get("/get", userAuth, getWorkshops);
+routes.get("/get", getWorkshops);
 routes.post("/register/:workshopId", userAuth, registeWorkshop);
 routes.get("/enquiries", userAuth, getEnquiries);
 routes.get("/get/count", userAuth, fetchWorkshopCount);

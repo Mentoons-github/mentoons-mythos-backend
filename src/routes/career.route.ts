@@ -20,7 +20,7 @@ import {
 const routes = express.Router();
 
 routes.post("/apply/:jobId", userAuth, applyCareer);
-routes.get("/jobs", userAuth, getJobs);
+routes.get("/jobs", getJobs);
 routes.get("/job/:jobId", userAuth, getJobById);
 routes.get("/job/get/count", userAuth, fetchJobCount);
 routes.post("/job/createjob", userAuth, createJobs);
