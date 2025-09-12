@@ -4,6 +4,7 @@ import User from "../models/userModel";
 import { passwordCompare, passwordHash } from "../utils/bcrypt";
 import CustomError from "../utils/customError";
 import {
+  cookieOptions,
   generateAccessToken,
   generateRefreshToken,
   sendAccessToken,
@@ -90,9 +91,8 @@ export const accessTokenGenerator = async (
 };
 
 export const logout = async (res: Response) => {
-  res.clearCookie("token");
-  res.clearCookie("refreshToken");
-
+  res.clearCookie("token", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
   return "Logout Successfully";
 };
 
