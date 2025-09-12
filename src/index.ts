@@ -22,6 +22,9 @@ import chatRoutes from "./routes/chat.routes";
 import assessmentRoutes from "./routes/assessment.route";
 import paymentRoutes from "./routes/payment.routes";
 import careerRoutes from './routes/career.route'
+import bookCallRoutes from './routes/bookCall.routes'
+import workshopRoutes from './routes/workshop.route'
+import Report_BlockRoutes from './routes/report-block.routes'
 
 //employee router
 import employeeRoutes from "./routes/employee.routes";
@@ -62,6 +65,9 @@ app.use("/api/v1/chat", chatRoutes);
 app.use("/api/v1/assessment", assessmentRoutes);
 app.use("/api/v1/payment", paymentRoutes);
 app.use("/api/v1/career", careerRoutes)
+app.use("/api/v1/book-call", bookCallRoutes)
+app.use("/api/v1/workshop", workshopRoutes)
+app.use("/api/v1/report-block", Report_BlockRoutes)
 
 //employee
 app.use("/api/v1/employee", employeeRoutes);
