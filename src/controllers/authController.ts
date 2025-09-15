@@ -9,7 +9,7 @@ export const registerUser = catchAsync(async (req, res) => {
   const { value, error } = userAuthJoi.validate(req.body);
   const data = await authServices.registerUser(value, res, error);
   res
-    .status(201)
+    .status(200)
     .json({ message: "Registration Successfull", user: data.user });
 });
 
