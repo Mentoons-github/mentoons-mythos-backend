@@ -80,10 +80,10 @@ export const upsertZodiac = catchAsync(async (req, res) => {
     return res.status(304).json({ message: "No data changed" });
   }
 
-  await UserUpdate({
-    details: { astrologyReports: { sun: null, moon: null } },
-    userId,
-  });
+  // await UserUpdate({
+  //   details: { astrologyReports: { sun: null, moon: null } },
+  //   userId,
+  // });
 
   const { user: updatedUser } = await UserUpdate({
     details: astroData,
@@ -101,6 +101,8 @@ export const upsertZodiac = catchAsync(async (req, res) => {
       longitude: Number(updatedUser.longitude),
       token,
     });
+
+    console.log( sunSign, moonSign, report, nakshatra, zodiac,'dfghjk,')
 
   const astrologyDetail: Record<string, string> = {};
   const astrologyReports: any = { ...updatedUser.astrologyReports };
@@ -158,13 +160,9 @@ export const upsertZodiac = catchAsync(async (req, res) => {
 
 export const checkRashiStatus = catchAsync(async (req, res) => {
   const userId = req.user._id;
-
   const hasRashi = await userHasRashi(userId);
-  if (hasRashi) {
     res.status(200).json(hasRashi);
-  } else {
-    res.status(401).json(hasRashi);
-  }
+ 
 });
 
 const isSignType = (value: unknown): value is SignType => {

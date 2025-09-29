@@ -15,6 +15,8 @@ export interface IUser {
   astrologyReports?: AstroReport;
   isBlocked: boolean;
   role: string;
+  takeInitialAssessment: boolean;
+  intelligenceTypes: string[];
 }
 
 export interface AstroReport {

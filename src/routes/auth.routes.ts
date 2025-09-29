@@ -10,6 +10,7 @@ import {
   logout,
   forgotPassword,
   changePassword,
+  deleteAccount,
 } from "../controllers/authController";
 import userAuth from "../middlewares/authMiddleware";
 import passport from "passport";
@@ -22,10 +23,11 @@ router.post("/login", loginUser);
 router.get("/get-access-token", accessTokenGenerator);
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtpHandler);
-router.post("/forgot-password", forgotPassword);
-router.put("/change-password", userAuth, changePassword);
+router.patch("/forgot-password", forgotPassword);
+router.patch("/change-password/:userId", userAuth, changePassword);
 router.post("/logout", logout);
 router.get("/user", userAuth, getUsers);
+router.post("/delete", userAuth, deleteAccount);
 router.get(
   "/google",
   passport.authenticate("google", {
@@ -33,7 +35,6 @@ router.get(
     failureRedirect: `${config.FRONTEND_URL}/oauth-result?status=failure&error=auth_start_failed`,
   })
 );
-
 router.get(
   "/google/callback",
   passport.authenticate("google", {

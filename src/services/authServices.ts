@@ -19,6 +19,7 @@ import {
 } from "../utils/otpGenerator";
 import { Response } from "express";
 
+// register
 export const registerUser = async (
   value: IUser,
   res: Response,
@@ -55,9 +56,16 @@ export const registerUser = async (
   return { user, accessToken, refreshToken };
 };
 
+//login
 export const loginUser = async (userData: IUser, res: Response) => {
   const { email, password } = userData;
   const user = await User.findOne({ email });
+  if (user?.isBlocked) {
+    throw new CustomError(
+      "You has been blocked. Please contact mentoonsmythos admin",
+      400
+    );
+  }
   if (user?.isGoogleUser && !user.password) {
     throw new CustomError(
       "This email is registered via Google login. Please use 'Sign in with Google' instead, or add password from 'Forgot your password'",
@@ -79,6 +87,7 @@ export const loginUser = async (userData: IUser, res: Response) => {
   };
 };
 
+// generate acceess token
 export const accessTokenGenerator = async (
   res: Response,
   refToken: string
@@ -90,12 +99,14 @@ export const accessTokenGenerator = async (
   return { accessToken: newAccessToken };
 };
 
+//logout
 export const logout = async (res: Response) => {
   res.clearCookie("token", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
   return "Logout Successfully";
 };
 
+// google register
 export const googleRegister = async (
   googleUser: Google_userInterface,
   res: Response
@@ -105,6 +116,13 @@ export const googleRegister = async (
   const profilePicture = googleUser.photos?.[0]?.value || null;
 
   let user = await User.findOne({ email });
+
+  if (user?.isBlocked) {
+    throw new CustomError(
+      "You has been blocked. Please contact mentoonsmythos admin",
+      400
+    );
+  }
 
   if (!user) {
     const [firstName, ...rest] = userName.split(" ");
@@ -128,8 +146,10 @@ export const googleRegister = async (
   return accessToken;
 };
 
+//send otp
 export const sendOtp = async (email: string) => {
   const userExists = await User.findOne({ email });
+  console.log(userExists, "existsssssss");
   if (userExists) {
     throw new CustomError("Email already Registered", 400);
   }
@@ -138,6 +158,7 @@ export const sendOtp = async (email: string) => {
   await sendOTPEmail(email, otp);
 };
 
+//very otp
 export const verifyOtpHandler = async ({
   email,
   otp,
@@ -159,6 +180,7 @@ export const verifyOtpHandler = async ({
   }
 };
 
+// forgot password
 export const forgotPassword = async ({
   email,
   newPassword,
@@ -171,17 +193,33 @@ export const forgotPassword = async ({
     throw new CustomError("Email Not Registered", 400);
   }
 
-  if (newPassword.length < 6) {
-    throw new CustomError("Password should have at least 6 characters", 400);
-  }
-  if (newPassword.length > 10) {
-    throw new CustomError("Password cannot exceed 10 characters", 400);
-  }
-
-  console.log(newPassword.length);
-
   user.password = await passwordHash(newPassword);
   await user.save();
-
   return "Password reset successful";
+};
+
+// change password
+export const changePassword = async (
+  userId: string,
+  {
+    currentPassword,
+    newPassword,
+  }: { currentPassword: string; newPassword: string }
+) => {
+  const user = await User.findById(userId).select("+password +email");
+  if (!user) {
+    throw new CustomError("User not found", 400);
+  }
+  const isMatch = await passwordCompare(currentPassword, user.password);
+  if (!isMatch) throw new CustomError("Invalid Password", 400);
+  user.password = await passwordHash(newPassword);
+  await user.save();
+  return "Password reset successful";
+};
+
+// delete account
+export const deleteAccount = async (userId: string, res:Response) => {
+  res.clearCookie("token", cookieOptions);
+  res.clearCookie("refreshToken", cookieOptions);
+  await User.findByIdAndDelete(userId);
 };

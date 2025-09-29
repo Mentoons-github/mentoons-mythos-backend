@@ -45,14 +45,13 @@ const userAuthJoi = Joi.object({
 
   password: Joi.string()
     .min(6)
-    .max(10)
-    .pattern(/^[a-zA-Z0-9]{6,10}$/)
+    .pattern(/[0-9]/, "number") 
+    .pattern(/[!@#$%^&*(),.?_":{}|<>]/, "special character") 
     .required()
     .messages({
-      "string.pattern.base": messages.invalidPassword,
-      "string.min": messages.passwordMin,
-      "string.max": messages.passwordMax,
-      "any.required": messages.required,
+      "string.min": "Password must have at least 6 characters",
+      "string.pattern.name": "Password must contain at least one {#name}", 
+      "any.required": "Please enter a new password",
     }),
 }).options({ allowUnknown: true });
 

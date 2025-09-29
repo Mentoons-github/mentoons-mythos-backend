@@ -18,3 +18,19 @@ export interface IAssessmentQuestion {
     options: string[];
   }[];
 }
+
+export interface SubmissionsI {
+  assessmentName: string;
+  question: string;
+  answer: string;
+  optionNo: number;
+  options: string[];
+}
+
+export interface InitialAssessmentI {
+  userId: mongoose.Types.ObjectId;
+  assessmentType: string;
+  submissions: SubmissionsI[];
+  intelligenceTypes: string[];
+  scores?: Map<string, number>;
+}
