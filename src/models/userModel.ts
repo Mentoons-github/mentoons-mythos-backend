@@ -118,6 +118,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "user",
     },
+    takeInitialAssessment: {
+      type: Boolean,
+      default: false,
+    },
+    intelligenceTypes: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true }
 );

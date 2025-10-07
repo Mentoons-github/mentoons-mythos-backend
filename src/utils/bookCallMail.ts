@@ -4,6 +4,17 @@ import { IEnquiry } from "../interfaces/workshopInterface";
 import { ICareer } from "../interfaces/careerInterface";
 import axios from "axios";
 
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: config.EMAIL_USER,
+    pass: config.EMAIL_PASS,
+  },
+});
+
+// book call
 export const BookConfirmationMail = async ({
   name,
   email,
@@ -19,16 +30,6 @@ export const BookConfirmationMail = async ({
   type: string;
   mobileNumber: string;
 }) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: config.EMAIL_USER,
-      pass: config.EMAIL_PASS,
-    },
-  });
-
   const formattedType = type.charAt(0).toUpperCase() + type.slice(1);
 
   // --- Email to User ---
@@ -94,6 +95,7 @@ Thank you for booking with us!`,
   });
 };
 
+// register workshop
 export const RegisterWorkshopMail = async ({
   firstName,
   lastName,
@@ -101,16 +103,6 @@ export const RegisterWorkshopMail = async ({
   category,
   email,
 }: IEnquiry) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: config.EMAIL_USER,
-      pass: config.EMAIL_PASS,
-    },
-  });
-
   const fullName = `${firstName} ${lastName}`;
   const formattedCategory =
     category.charAt(0).toUpperCase() + category.slice(1);
@@ -170,22 +162,13 @@ We look forward to seeing you at the workshop!`,
   });
 };
 
+// apply job
 export const ApplyJobMail = async ({
   name,
   email,
   mobileNumber,
   position,
 }: ICareer) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: config.EMAIL_USER,
-      pass: config.EMAIL_PASS,
-    },
-  });
-
   // --- Email to Candidate ---
   await transporter.sendMail({
     from: `"Mentoons Careers" <${config.EMAIL_USER}>`,
@@ -251,10 +234,11 @@ interface SendAssignmentsProps {
   jobTitle: string;
   dueDate: string;
   dueTime: string;
-  fileUrl: string; // S3 file URL (can be signed or public)
-  link?: string; // optional Figma or other resource link
+  fileUrl: string;
+  link?: string;
 }
 
+//send assignement
 export const sendAssignments = async ({
   appDetails,
   jobTitle,
@@ -263,16 +247,6 @@ export const sendAssignments = async ({
   fileUrl,
   link,
 }: SendAssignmentsProps) => {
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: config.EMAIL_USER,
-      pass: config.EMAIL_PASS,
-    },
-  });
-
   const response = await axios.get(fileUrl, { responseType: "arraybuffer" });
 
   const fileName = `${jobTitle}.pdf`;
@@ -329,10 +303,47 @@ Mentoons Careers Team`,
       attachments: [
         {
           filename: fileName,
-          content: response.data, // file buffer
-          contentType: response.headers["content-type"], // ensures correct type
+          content: response.data,
+          contentType: response.headers["content-type"],
         },
       ],
     });
   }
+};
+
+// send newsletter messages
+export const sendNewsletterMessages = async ({
+  emails,
+  subject,
+  message,
+}: {
+  emails: string[];
+  subject: string;
+  message: string;
+}) => {
+  const emailPromises = emails.map((email) =>
+    transporter.sendMail({
+      from: `"Mentoons Newsletter" <${config.EMAIL_USER}>`,
+      to: email,
+      subject,
+      text: message,
+      html: `
+        <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333;">
+          <h2 style="color:#4CAF50;">📢 ${subject}</h2>
+          <p>Hello,</p>
+          <p>${message}</p>
+          <p style="margin-top:20px;">Best regards,<br/><b>Mentoons Team</b></p>
+          <hr/>
+          <p style="font-size:12px; color:#777;">
+            You are receiving this email because you subscribed to our newsletter.  
+            If you no longer wish to receive updates, please <a href="#">unsubscribe</a>.
+          </p>
+        </div>
+      `,
+    })
+  );
+
+  await Promise.all(emailPromises);
+
+  return "Emails sent successfully!";
 };

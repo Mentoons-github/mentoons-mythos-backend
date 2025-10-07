@@ -20,8 +20,17 @@ export const fetchAllUsers = catchAsync(async (req, res) => {
   const limit = parseInt(req.query.limit as string) || 0;
   const sort = (req.query.sort as "newest" | "oldest") || "newest";
   const search = (req.query.search as string) || "";
+  const filterBy = (req.query.filterBy as string) || "";
+  const filterValue = (req.query.filterValue as string) || "";
 
-  const users = await userService.fetchAllUsers(page, limit, sort, search);
+  const users = await userService.fetchAllUsers(
+    page,
+    limit,
+    sort,
+    search,
+    filterBy,
+    filterValue
+  );
   res.status(200).json({
     success: true,
     ...users,
@@ -29,11 +38,12 @@ export const fetchAllUsers = catchAsync(async (req, res) => {
 });
 
 //fetch user count
-export const fetchUserCount = catchAsync(async(req,res) => {
-  const count = await userService.fetchUserCount()
-  res.status(200).json({message:"count fetched", count})
-})
+export const fetchUserCount = catchAsync(async (req, res) => {
+  const count = await userService.fetchUserCount();
+  res.status(200).json({ message: "count fetched", count });
+});
 
+//block user
 export const blockUser = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const currentUserId = req.user._id;

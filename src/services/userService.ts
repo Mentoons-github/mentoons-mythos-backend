@@ -10,10 +10,29 @@ export const fetchAllUsers = async (
   page: number,
   limit: number,
   sort: "newest" | "oldest" = "newest",
-  search?: string
+  search?: string,
+  filterBy?: string,
+  filterValue?: string
 ) => {
   const skip = (page - 1) * limit;
   const query: any = {};
+
+  if (filterBy && filterValue) {
+    if (filterBy === "Rashi") {
+      query.$or = [
+        { "astrologyDetail.sunSign": filterValue },
+        { "astrologyDetail.moonSign": filterValue },
+      ];
+    } else if (filterBy === "Intelligence") {
+      query.intelligenceTypes = filterValue;
+    } else if (filterBy === "Block") {
+      if (filterValue === "Blocked") {
+        query.isBlocked = true;
+      } else if (filterValue === "Not Blocked") {
+        query.isBlocked = false;
+      }
+    }
+  }
 
   if (search) {
     query.$or = [
@@ -25,13 +44,12 @@ export const fetchAllUsers = async (
 
   const sortOrder = sort === "newest" ? -1 : 1;
 
-  const total = await User.countDocuments(query);
-
   const users = await User.find(query)
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: sortOrder });
 
+  const total = await User.countDocuments(query);
   return {
     users,
     page,
@@ -40,11 +58,11 @@ export const fetchAllUsers = async (
   };
 };
 
-//fetch user count 
-export const fetchUserCount = async() => {
-  const user = await User.find()
-  return user.length
-}
+//fetch user count
+export const fetchUserCount = async () => {
+  const user = await User.find();
+  return user.length;
+};
 
 //block user
 export const blockUser = async (userId: string, currentUserId: string) => {
