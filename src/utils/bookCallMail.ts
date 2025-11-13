@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 import config from "../config/config";
 import { IEnquiry } from "../interfaces/workshopInterface";
-import { ICareer } from "../interfaces/careerInterface";
+import { ICareer, IMentor } from "../interfaces/careerInterface";
 import axios from "axios";
 
 const transporter = nodemailer.createTransport({
@@ -168,8 +168,12 @@ export const ApplyJobMail = async ({
   email,
   mobileNumber,
   position,
-}: ICareer) => {
-  // --- Email to Candidate ---
+}: {
+  name: string;
+  email: string;
+  mobileNumber: number;
+  position: string;
+}) => {
   await transporter.sendMail({
     from: `"Mentoons Careers" <${config.EMAIL_USER}>`,
     to: email,
@@ -202,10 +206,9 @@ Mentoons Careers Team`,
     `,
   });
 
-  // --- Email to Company / HR ---
   await transporter.sendMail({
     from: `"Job Application" <${config.EMAIL_USER}>`,
-    to: config.EMAIL_USER, // company HR email
+    to: config.EMAIL_USER,
     subject: `📩 New Job Application - ${position}`,
     text: `A new job application has been received:
 
@@ -344,6 +347,74 @@ export const sendNewsletterMessages = async ({
   );
 
   await Promise.all(emailPromises);
-
   return "Emails sent successfully!";
+};
+
+// career gps mail
+export const CareerGPSMail = async ({
+  name,
+  email,
+  mobileNumber,
+}: {
+  name: string;
+  email: string;
+  mobileNumber: number;
+}) => {
+  // Email to User
+  await transporter.sendMail({
+    from: `"Mentoons Career GPS" <${config.EMAIL_USER}>`,
+    to: email,
+    subject: "✅ Career GPS Enquiry Submitted Successfully",
+    text: `Hello ${name},
+
+Thank you for submitting your enquiry in Mentoons Career GPS.
+
+📌 Provided Details:
+- Name: ${name}
+- Mobile: ${mobileNumber}
+- Email: ${email}
+
+Our guidance team will reach out to you shortly.
+
+Best regards,  
+Mentoons Career GPS Team`,
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333;">
+        <h2 style="color:#4CAF50;">Career GPS Enquiry Received ✅</h2>
+        <p>Hello <b>${name}</b>,</p>
+        <p>Thank you for showing interest in our <b>Career GPS Program</b>.</p>
+        <ul>
+          <li><b>Name:</b> ${name}</li>
+          <li><b>Email:</b> ${email}</li>
+          <li><b>Mobile:</b> ${mobileNumber}</li>
+        </ul>
+        <p>Our team will contact you soon with further details.</p>
+        <p>Warm Regards,<br><b>Mentoons Career GPS Team</b></p>
+      </div>
+    `,
+  });
+
+  // Email to Admin
+  await transporter.sendMail({
+    from: `"Career GPS Enquiry" <${config.EMAIL_USER}>`,
+    to: config.EMAIL_USER,
+    subject: `📩 New Career GPS Enquiry - ${name}`,
+    text: `New Career GPS enquiry received:
+
+👤 Name: ${name}
+📧 Email: ${email}
+📞 Mobile: ${mobileNumber}
+`,
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height:1.6; color:#333;">
+        <h2 style="color:#2196F3;">New Career GPS Enquiry 📩</h2>
+        <p>A new enquiry has been submitted for the Career GPS program:</p>
+        <ul>
+          <li><b>Name:</b> ${name}</li>
+          <li><b>Email:</b> ${email}</li>
+          <li><b>Mobile:</b> ${mobileNumber}</li>
+        </ul>
+      </div>
+    `,
+  });
 };

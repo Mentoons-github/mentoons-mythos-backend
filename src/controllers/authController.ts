@@ -16,8 +16,9 @@ export const registerUser = catchAsync(async (req, res) => {
 
 //login
 export const loginUser = catchAsync(async (req, res) => {
-  await authServices.loginUser(req.body, res);
-  return res.status(200).json({ message: "Login Successfull" });
+  const user = await authServices.loginUser(req.body, res);
+  const {role} = user
+  return res.status(200).json({ message: "Login Successfull", role });
 });
 
 // generate access token

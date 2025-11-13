@@ -33,8 +33,8 @@ const blogSchema = new mongoose.Schema<IBlogDocument>(
       type: Boolean,
       default: false,
     },
-    commentCount:{
-      type:Number
+    commentCount: {
+      type: Number,
     },
     viewers: [{ type: Schema.Types.ObjectId, ref: "User" }],
     searchTitle: String,

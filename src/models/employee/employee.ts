@@ -19,7 +19,7 @@ const employeeSchema = new mongoose.Schema<IEmployeeDocument>(
       trim: true,
     },
     employeeID: {
-      type: Number,
+      type: String,
       required: true,
       unique: true,
     },
@@ -30,32 +30,66 @@ const employeeSchema = new mongoose.Schema<IEmployeeDocument>(
     },
     assignedBy: {
       type: String,
-      required: true,
     },
     role: {
       type: String,
-      enum: ["employee", "admin"],
       default: "employee",
     },
-    createdAt: {
-      type: Date,
-      default: Date.now,
+    designation: {
+      type: String,
+      required: true,
+    },
+    jobType: {
+      type: String,
+      required: true,
+    },
+    department: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ["Male", "Female", "Others"],
+      required: true,
+    },
+    salary: {
+      type: Number,
+      required: true,
+    },
+    profileImage: {
+      type: String,
     },
   },
   { timestamps: true }
 );
 
-employeeSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
+employeeSchema.pre("save", function (next) {
+  if (!this.profileImage) {
+    if (this.gender === "Male") {
+      this.profileImage =
+        "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+    } else if (this.gender === "Female") {
+      this.profileImage =
+        "https://cdn-icons-png.flaticon.com/512/6997/6997662.png";
+    } else {
+      this.profileImage =
+        "https://cdn-icons-png.flaticon.com/512/4140/4140048.png";
+    }
+  }
   next();
 });
 
-employeeSchema.methods.comparePassword = async function (
-  candidatePassword: string
-): Promise<boolean> {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
+// employeeSchema.pre("save", async function (next) {
+//   if (!this.isModified("password")) return next();
+//   this.password = await bcrypt.hash(this.password, 10);
+//   next();
+// });
+
+// employeeSchema.methods.comparePassword = async function (
+//   candidatePassword: string
+// ): Promise<boolean> {
+//   return await bcrypt.compare(candidatePassword, this.password);
+// };
 
 const Employee = mongoose.model<IEmployeeDocument, IEmployeeModel>(
   "Employee",

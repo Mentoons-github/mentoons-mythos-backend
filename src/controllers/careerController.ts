@@ -101,6 +101,7 @@ export const fetchJobApplicationCount = catchAsync(async (req, res) => {
     .json({ message: "Application count successfully fetched", count });
 });
 
+//delete single application
 export const deleteJobApplication = catchAsync(async (req, res) => {
   const deletedApplication = await careerServices.deleteJobApplication(
     req.params.applicationId
@@ -112,6 +113,7 @@ export const deleteJobApplication = catchAsync(async (req, res) => {
   });
 });
 
+//delete selected application
 export const deleteSelectedJobApplications = catchAsync(async (req, res) => {
   const { applicationIds } = req.body;
   const deletedApplication = await careerServices.deleteSelectedJobApplications(
@@ -124,6 +126,7 @@ export const deleteSelectedJobApplications = catchAsync(async (req, res) => {
   });
 });
 
+//get single application
 export const getSingleJobApplication = catchAsync(async (req, res) => {
   const singleApplication = await careerServices.getSingleJobApplication(
     req.params.applicationId
