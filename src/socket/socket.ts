@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import Chat from "../models/chatModel";
 import User from "../models/userModel";
 import config from "../config/config";
+import Notification from "../models/notificationModel";
 
 export const setupSocket = (server: any) => {
   const io = new Server(server, {
@@ -54,8 +55,38 @@ export const setupSocket = (server: any) => {
       }
     });
 
+    socket.on("join-user", (userId: string) => {
+      socket.join(userId);
+    });
+
+    socket.on(
+      "send-notification",
+      async ({ receiverId, receiverModel, message, type, relatedId }) => {
+        console.log(relatedId,'idddddddddd')
+        try {
+          const actualReceiverId =
+            receiverId === "admin" ? "686f6a3359283643320d45bf" : receiverId;
+
+          const notification = await Notification.create({
+            receiverId: actualReceiverId,
+            receiverModel,
+            message,
+            type,
+            relatedId,
+          });
+
+          console.log("📩 Notification saved:", notification);
+
+          io.to(actualReceiverId).emit("receive-notification", notification);
+        } catch (error) {
+          console.error("❌ Error sending notification:", error);
+        }
+      }
+    );
+
     socket.on("disconnect", () => {
       console.log(`🔴 Socket disconnected: ${socket.id}`);
     });
   });
+  return io;
 };

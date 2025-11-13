@@ -11,6 +11,8 @@ import { notFoundHandler } from "./middlewares/notfound";
 import upload from "./middlewares/multer";
 import { createServer } from "http";
 import { setupSocket } from "./socket/socket";
+import "./utils/jobOverdue";
+import "./utils/MarkAbsentAttendance";
 
 //router
 import authRoutes from "./routes/auth.routes";
@@ -28,6 +30,11 @@ import Report_BlockRoutes from "./routes/report-block.routes";
 import newsLetterRoutes from "./routes/newsLetter.route";
 import groupsRoutes from "./routes/group.route";
 import aboutRoutes from "./routes/aboutComment.route";
+import adminRoutes from "./routes/admin.routes";
+import mentorRoutes from "./routes/mentor.routes";
+import careerGpsRoutes from "./routes/careerGps.route";
+
+import notificationRoutes from "./routes//notification.route";
 
 //employee router
 import employeeRoutes from "./routes/employee.routes";
@@ -74,7 +81,11 @@ app.use("/api/v1/report-block", Report_BlockRoutes);
 app.use("/api/v1/newsletter", newsLetterRoutes);
 app.use("/api/v1/groups", groupsRoutes);
 app.use("/api/v1/about", aboutRoutes);
+app.use("/api/v1/notification", notificationRoutes);
+app.use("/api/v1/mentor", mentorRoutes);
+app.use("/api/v1/career-gps", careerGpsRoutes);
 
+app.use("/api/v1/admin", adminRoutes);
 //employee
 app.use("/api/v1/employee", employeeRoutes);
 
@@ -83,7 +94,7 @@ app.use(globalErrorHandling);
 
 const server = createServer(app);
 
-setupSocket(server);
+export const io = setupSocket(server);
 
 server.listen(PORT, () => {
   console.log(`Server running on PORT ${PORT}`);

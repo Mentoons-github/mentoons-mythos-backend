@@ -3,6 +3,7 @@ import CustomError from "../utils/customError";
 import config from "../config/config";
 import User from "../models/userModel";
 import { RequestHandler } from "express";
+import Employee from "../models/employee/employee";
 
 const userAuth: RequestHandler = async (req, res, next) => {
   try {
@@ -19,12 +20,20 @@ const userAuth: RequestHandler = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, secretKey) as JwtPayload;
-    const user = await User.findById(decoded.userId);
-    if (!user) {
-      throw new CustomError("Access Forbidden", 403);
+    let currentUser = null;
+
+    if (decoded.role === "employee") {
+      currentUser = await Employee.findById(decoded.userId);
+    } else {
+      currentUser = await User.findById(decoded.userId);
     }
 
-    req.user = user;
+    if (!currentUser) {
+      throw new CustomError("Access Forbidden - Invalid user or employee", 403);
+    }
+
+    req.user = currentUser;
+    // req.role = decoded.role;
     next();
   } catch (error) {
     next(error);

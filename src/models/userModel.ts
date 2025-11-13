@@ -126,6 +126,9 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    designation:{
+      type:String
+    }
   },
   { timestamps: true }
 );

@@ -18,6 +18,7 @@ import {
   verifyOTP,
 } from "../utils/otpGenerator";
 import { Response } from "express";
+import Employee from "../models/employee/employee";
 
 // register
 export const registerUser = async (
@@ -48,8 +49,8 @@ export const registerUser = async (
     country,
     about,
   });
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
+  const accessToken = generateAccessToken(user._id, "user");
+  const refreshToken = generateRefreshToken(user._id, "user");
   sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
 
@@ -59,29 +60,78 @@ export const registerUser = async (
 //login
 export const loginUser = async (userData: IUser, res: Response) => {
   const { email, password } = userData;
-  const user = await User.findOne({ email });
-  if (user?.isBlocked) {
-    throw new CustomError(
-      "You has been blocked. Please contact mentoonsmythos admin",
-      400
-    );
+
+  // ✅ Find user and employee in parallel
+  const [user, employee] = await Promise.all([
+    User.findOne({ email }),
+    Employee.findOne({ email }),
+  ]);
+
+  // ❌ If neither found
+  if (!user && !employee) {
+    throw new CustomError("Invalid Email ID", 400);
   }
+
+  // ✅ Handle blocked users
+  if (user?.isBlocked) {
+    throw new CustomError("You have been blocked. Please contact admin.", 400);
+  }
+
+  // ✅ Handle Google login case
   if (user?.isGoogleUser && !user.password) {
     throw new CustomError(
-      "This email is registered via Google login. Please use 'Sign in with Google' instead, or add password from 'Forgot your password'",
+      "This email is registered via Google login. Please use 'Sign in with Google' or reset your password.",
       400
     );
   }
-  if (!user) throw new CustomError("Invalid Email id", 400);
-  const validPassword = await passwordCompare(password, user.password);
-  if (!validPassword) throw new CustomError("Invalid Password", 400);
-  const accessToken = generateAccessToken(user._id);
-  const refreshToken = generateRefreshToken(user._id);
+
+  let account: any = null;
+  let role: string = "user";
+
+  // ✅ If both exist (check which password matches)
+  if (user && employee) {
+    const isUserMatch = await passwordCompare(password, user.password);
+    const isEmployeeMatch = await passwordCompare(password, employee.password);
+
+    if (isEmployeeMatch) {
+      account = employee;
+      role = "employee";
+    } else if (isUserMatch) {
+      account = user;
+      role = user.role || "user";
+    } else {
+      throw new CustomError("Invalid Password", 400);
+    }
+  }
+
+  // ✅ If only user exists
+  else if (user) {
+    const isUserMatch = await passwordCompare(password, user.password);
+    if (!isUserMatch) throw new CustomError("Invalid Password", 400);
+    account = user;
+    role = user.role || "user";
+  }
+
+  // ✅ If only employee exists
+  else if (employee) {
+    const isEmployeeMatch = await passwordCompare(password, employee.password);
+    if (!isEmployeeMatch) throw new CustomError("Invalid Password", 400);
+    account = employee;
+    role = "employee";
+  }
+
+  // ✅ Generate tokens
+  const accessToken = generateAccessToken(account._id, role);
+  const refreshToken = generateRefreshToken(account._id, role);
+
   sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
+
+  // ✅ Return login details
   return {
-    _id: user._id,
-    email: user.email,
+    _id: account._id,
+    email: account.email,
+    role,
     accessToken,
     refreshToken,
   };
@@ -94,7 +144,7 @@ export const accessTokenGenerator = async (
 ): Promise<object> => {
   const payload = verifyRefreshToken(refToken);
   if (!payload.userId) throw new CustomError("Unauthorized !", 401);
-  const newAccessToken = generateAccessToken(payload.userId);
+  const newAccessToken = generateAccessToken(payload.userId, payload.role);
   sendAccessToken(res, newAccessToken);
   return { accessToken: newAccessToken };
 };
@@ -138,8 +188,8 @@ export const googleRegister = async (
     });
   }
 
-  const accessToken = generateAccessToken(user?._id);
-  const refreshToken = generateRefreshToken(user._id);
+  const accessToken = generateAccessToken(user?._id, "user");
+  const refreshToken = generateRefreshToken(user._id, "user");
   sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
 
@@ -206,19 +256,32 @@ export const changePassword = async (
     newPassword,
   }: { currentPassword: string; newPassword: string }
 ) => {
-  const user = await User.findById(userId).select("+password +email");
-  if (!user) {
-    throw new CustomError("User not found", 400);
+  const [user, employee] = await Promise.all([
+    User.findById(userId).select("email password"),
+    Employee.findById(userId).select("email password"),
+  ]);
+  if (!user && !employee) {
+    throw new CustomError("Invalid Email ID", 400);
   }
-  const isMatch = await passwordCompare(currentPassword, user.password);
-  if (!isMatch) throw new CustomError("Invalid Password", 400);
-  user.password = await passwordHash(newPassword);
-  await user.save();
+  if (user) {
+    const isUserMatch = await passwordCompare(currentPassword, user.password);
+    if (!isUserMatch) throw new CustomError("Invalid Password", 400);
+    user.password = await passwordHash(newPassword);
+    await user.save();
+  } else if (employee) {
+    const isEmployeeMatch = await passwordCompare(
+      currentPassword,
+      employee.password
+    );
+    if (!isEmployeeMatch) throw new CustomError("Invalid Password", 400);
+    employee.password = await passwordHash(newPassword);
+    await employee.save();
+  }
   return "Password reset successful";
 };
 
 // delete account
-export const deleteAccount = async (userId: string, res:Response) => {
+export const deleteAccount = async (userId: string, res: Response) => {
   res.clearCookie("token", cookieOptions);
   res.clearCookie("refreshToken", cookieOptions);
   await User.findByIdAndDelete(userId);

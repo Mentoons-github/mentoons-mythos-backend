@@ -17,6 +17,7 @@ export interface IUser {
   role: string;
   takeInitialAssessment: boolean;
   intelligenceTypes: string[];
+  designation:string
 }
 
 export interface AstroReport {

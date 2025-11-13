@@ -20,7 +20,6 @@ export const createBlog = async (data: IBlog, userId: string) => {
     tags: Array.isArray(data.tags) ? data.tags.map((tag) => tag.trim()) : [],
   });
 
-  console.log(blog, "blog");
   return blog;
 };
 

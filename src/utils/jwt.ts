@@ -6,12 +6,12 @@ import CustomError from "./customError";
 
 interface Itoken {
   userId: Types.ObjectId;
-  role: "user" | "employee" | "admin";
+  role: string
 }
 
 export const generateAccessToken = (
   userId: Types.ObjectId,
-  role: "user" | "employee" | "admin" = "user"
+  role: string
 ) => {
   const JWT_SECRET_KEY = config.JWT_SECRET_KEY as string;
   const payload = { userId, role };
@@ -20,7 +20,7 @@ export const generateAccessToken = (
 
 export const generateRefreshToken = (
   userId: Types.ObjectId,
-  role: "user" | "employee" | "admin" = "user"
+  role: string
 ): string => {
   const JWT_SECRET_KEY = config.JWT_SECRET_KEY as string;
   const payload = { userId, role };
