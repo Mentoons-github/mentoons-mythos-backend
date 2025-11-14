@@ -17,7 +17,7 @@ export const registerUser = catchAsync(async (req, res) => {
 //login
 export const loginUser = catchAsync(async (req, res) => {
   const user = await authServices.loginUser(req.body, res);
-  const {role} = user
+  const { role } = user;
   return res.status(200).json({ message: "Login Successfull", role });
 });
 
@@ -73,8 +73,10 @@ export const verifyOtpHandler = catchAsync(async (req, res) => {
 
 //forgot password
 export const forgotPassword = catchAsync(async (req, res) => {
-  const message = await authServices.forgotPassword(req.body);
-  res.status(200).json({ success: true, message });
+  const newPassword = await authServices.forgotPassword(req.body);
+  res
+    .status(200)
+    .json({ success: true, message: "Password reset successful", newPassword });
 });
 
 //get users
