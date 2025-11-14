@@ -245,7 +245,7 @@ export const forgotPassword = async ({
 
   user.password = await passwordHash(newPassword);
   await user.save();
-  return "Password reset successful";
+  return user.password;
 };
 
 // change password
