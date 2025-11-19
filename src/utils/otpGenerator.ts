@@ -66,11 +66,10 @@ export const generateOTP = (length = 6): string => {
 export const sendOTPEmail = async (email: string, otp: string) => {
   console.log(email, otp, "email and otp");
 
-  console.log(config.EMAIL_USER, "emailllllllllllll");
 
   const msg = {
     to: email,
-    from: config.EMAIL_USER as string,
+    from: "em3576.mentoonsmythos.com",
     subject: "Your OTP Code",
     text: `Your OTP is: ${otp}`,
     html: `
