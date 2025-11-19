@@ -21,6 +21,8 @@ const config = {
   CCAVENUE_MERCHANT_ID: process.env.CCAVENUE_MERCHANT_ID!,
   CCAVENUE_WORKING_KEY: process.env.CCAVENUE_WORKING_KEY!,
   CCAVENUE_ACCESS_CODE: process.env.CCAVENUE_ACCESS_CODE!,
+  RESEND_API_KEY: process.env.RESEND_API_KEY!,
+  SENDGRID_API_KEY: process.env.SENDGRID_API_KEY!,
 };
 
 export default config;
