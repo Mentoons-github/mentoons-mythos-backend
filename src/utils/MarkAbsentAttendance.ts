@@ -39,7 +39,6 @@ export const autoMarkAbsent = async () => {
   }
 };
 
-// Runs every day at 9:30 AM
 cron.schedule("0 7 * * *", async () => {
   await autoMarkAbsent();
 });

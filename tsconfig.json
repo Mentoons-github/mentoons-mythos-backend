@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "CommonJS",
+    "module": "nodenext",
+    //commonjs
     "rootDir": "./src",
     "outDir": "./dist",
     "strict": true,
@@ -9,7 +10,8 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
+    //node
     "types": ["node"]
   },
   "include": ["src"],
