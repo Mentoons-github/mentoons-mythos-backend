@@ -69,7 +69,7 @@ export const sendOTPEmail = async (email: string, otp: string) => {
 
   const msg = {
     to: email,
-    from: "em3576.mentoonsmythos.com",
+    from: "no-reply@em3576.mentoonsmythos.com",
     subject: "Your OTP Code",
     text: `Your OTP is: ${otp}`,
     html: `
