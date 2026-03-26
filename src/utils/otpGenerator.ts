@@ -1,4 +1,3 @@
-import nodemailer from "nodemailer";
 import config from "../config/config";
 import sgMail from "@sendgrid/mail";
 
@@ -69,7 +68,7 @@ export const sendOTPEmail = async (email: string, otp: string) => {
 
   const msg = {
     to: email,
-    from: "no-reply@em3576.mentoonsmythos.com",
+    from: "Mentoons Mythos <no-reply@em3576.mentoonsmythos.com>",
     subject: "Your OTP Code",
     text: `Your OTP is: ${otp}`,
     html: `
