@@ -19,6 +19,7 @@ import {
 } from "../utils/otpGenerator";
 import { Response } from "express";
 import Employee from "../models/employee/employee";
+import { addRewardPoints } from "./RewardPointServices";
 
 // register
 export const registerUser = async (
@@ -49,12 +50,19 @@ export const registerUser = async (
     country,
     about,
   });
+
+  const reward = await addRewardPoints({
+    userId: user._id,
+    action: "REGISTER",
+    points: 50,
+  });
+
   const accessToken = generateAccessToken(user._id, "user");
   const refreshToken = generateRefreshToken(user._id, "user");
   sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
 
-  return { user, accessToken, refreshToken };
+  return { user, accessToken, refreshToken, reward };
 };
 
 //login
@@ -165,6 +173,8 @@ export const googleRegister = async (
   const userName = googleUser.displayName;
   const profilePicture = googleUser.photos?.[0]?.value || null;
 
+  let reward = null;
+
   let user = await User.findOne({ email });
 
   if (user?.isBlocked) {
@@ -186,6 +196,12 @@ export const googleRegister = async (
       password: null,
       isGoogleUser: true,
     });
+
+    reward = await addRewardPoints({
+      userId: user._id,
+      action: "REGISTER",
+      points: 50,
+    });
   }
 
   const accessToken = generateAccessToken(user?._id, "user");
@@ -193,7 +209,7 @@ export const googleRegister = async (
   sendAccessToken(res, accessToken);
   sendRefreshToken(res, refreshToken);
 
-  return accessToken;
+  return { accessToken, reward };
 };
 
 //send otp

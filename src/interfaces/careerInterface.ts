@@ -10,7 +10,7 @@ export interface ICareer {
   cLocation: string;
   gender: string;
   status: string;
-  jobId: mongoose.Types.ObjectId;
+  jobId: mongoose.Types.ObjectId | string;
 }
 
 export interface IJobs {

@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 import { IUser } from "../interfaces/userInterface";
+import { Types } from "mongoose";
 
-export interface IUserDocument extends IUser, Document {}
+export interface IUserDocument extends IUser, Document {
+  _id: Types.ObjectId;   
+}
 
 const astroSchema = new mongoose.Schema(
   {
@@ -46,7 +49,7 @@ const astroSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const userSchema = new mongoose.Schema(
+const userSchema = new mongoose.Schema<IUserDocument>(
   {
     firstName: {
       type: String,
@@ -126,9 +129,17 @@ const userSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
-    designation:{
-      type:String
-    }
+    designation: {
+      type: String,
+    },
+    rewardPoints: {
+      type: Number,
+      default: 0,
+    },
+    lastDailyReward: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

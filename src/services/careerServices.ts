@@ -18,7 +18,6 @@ interface FilterParams {
 
 //apply for job
 export const applyCareer = async (datas: ICareer, jobId: string) => {
-  console.log(datas);
   const {
     name,
     email,
@@ -59,7 +58,7 @@ export const getJobs = async (
   page: number,
   limit: number,
   sort: "newest" | "oldest" = "newest",
-  search?: string
+  search?: string,
 ) => {
   const skip = (page - 1) * limit;
   const query: any = {};
@@ -156,7 +155,7 @@ export const updateJob = async (data: IJobs, jobId: string) => {
       responsibilities,
       endDescription,
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 
   if (!updatedJob) throw new CustomError("Job not found", 404);
@@ -246,7 +245,7 @@ export const deleteJobApplication = async (applicationId: string) => {
 
 //delete multiple application
 export const deleteSelectedJobApplications = async (
-  applicationIds: string[]
+  applicationIds: string[],
 ) => {
   const applications = await JobApplication.find({
     _id: { $in: applicationIds },
@@ -262,14 +261,14 @@ export const deleteSelectedJobApplications = async (
       acc[jobIdStr].push(app._id);
       return acc;
     },
-    {}
+    {},
   );
 
   await JobApplication.deleteMany({ _id: { $in: applicationIds } });
   const jobUpdatePromises = Object.entries(jobUpdates).map(([jobId, appIds]) =>
     Jobs.findByIdAndUpdate(jobId, {
       $pull: { applications: { $in: appIds } },
-    })
+    }),
   );
   await Promise.all(jobUpdatePromises);
   return { deletedCount: applicationIds.length };
@@ -310,7 +309,7 @@ export const sendAssignements = async ({
 
 export const updateApplicationStatus = async (
   applicationIds: string[],
-  status: string
+  status: string,
 ) => {
   if (
     !applicationIds ||
@@ -326,7 +325,7 @@ export const updateApplicationStatus = async (
 
   const result = await JobApplication.updateMany(
     { _id: { $in: applicationIds } },
-    { $set: { status } }
+    { $set: { status } },
   );
 
   return result;

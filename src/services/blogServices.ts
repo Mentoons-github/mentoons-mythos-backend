@@ -6,6 +6,7 @@ import CustomError from "../utils/customError";
 import { IComment } from "../interfaces/commentInterface";
 import Comment from "../models/commentModel";
 import Report from "../models/ReportModel";
+import { addRewardPoints } from "./RewardPointServices";
 
 //create blog
 export const createBlog = async (data: IBlog, userId: string) => {
@@ -20,7 +21,13 @@ export const createBlog = async (data: IBlog, userId: string) => {
     tags: Array.isArray(data.tags) ? data.tags.map((tag) => tag.trim()) : [],
   });
 
-  return blog;
+  const reward = await addRewardPoints({
+    userId,
+    action: "POST_BLOG",
+    points: 10,
+  });
+
+  return { blog, reward };
 };
 
 //fetch blog
@@ -52,9 +59,9 @@ export const fetchBlog = async (
 
 //fetch total blogs
 export const fetchBlogCount = async () => {
-  const blogs = await Blog.find()
-  return blogs.length
-}
+  const blogs = await Blog.find();
+  return blogs.length;
+};
 
 //fetch single blog
 export const fetchSingleBlog = async (blogId: string) => {

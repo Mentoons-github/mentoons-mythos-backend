@@ -1,4 +1,7 @@
+import { Types } from "mongoose";
+
 export interface IUser {
+  _id: Types.ObjectId | string;
   firstName: string;
   lastName: string;
   email: string;
@@ -9,15 +12,17 @@ export interface IUser {
   about?: string;
   country?: string;
   isGoogleUser?: boolean;
-  longitude: string;
-  latitude: string;
+  longitude: number;
+  latitude: number;
   astrologyDetail?: IAstrologyDetail;
   astrologyReports?: AstroReport;
   isBlocked: boolean;
   role: string;
   takeInitialAssessment: boolean;
   intelligenceTypes: string[];
-  designation:string
+  designation: string;
+  rewardPoints: number;
+  lastDailyReward: Date;
 }
 
 export interface AstroReport {

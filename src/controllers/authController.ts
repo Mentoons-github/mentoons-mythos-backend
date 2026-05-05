@@ -11,7 +11,11 @@ export const registerUser = catchAsync(async (req, res) => {
   const data = await authServices.registerUser(value, res, error);
   res
     .status(200)
-    .json({ message: "Registration Successfull", user: data.user });
+    .json({
+      message: "Registration Successfull",
+      user: data.user,
+      reward: data.reward,
+    });
 });
 
 //login

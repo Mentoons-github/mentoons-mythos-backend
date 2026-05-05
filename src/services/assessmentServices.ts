@@ -8,21 +8,29 @@ import InitialAssessment from "../models/initialAssessmentModel";
 import User from "../models/userModel";
 import { calculateScore } from "../utils/calculateAssessmentScore";
 import CustomError from "../utils/customError";
+import { addRewardPoints } from "./RewardPointServices";
 
 export const assessmentSubmission = async (
   userId: string,
-  details: IAssessment
+  details: IAssessment,
 ) => {
   if (!userId) {
     throw new CustomError("User not found", 404);
   }
-  console.log(details, "detaols");
-  return await Assessment.create({
+  const submittedDetails = await Assessment.create({
     userId: userId,
     assessmentName: details.assessmentName,
     assessmentType: details.assessmentType,
     submissions: details.submissions,
   });
+
+  const reward = await addRewardPoints({
+    userId,
+    action: "TAKE_ASSESSMENT",
+    points: 10,
+  });
+
+  return { submittedDetails, reward };
 };
 
 //create assessment
@@ -63,7 +71,7 @@ export const getAllAssessments = async (
   limit: number,
   page: number,
   sort: string,
-  search?: string
+  search?: string,
 ) => {
   const skip = (page - 1) * limit;
   const sortOrder = sort === "newest" ? -1 : 1;
@@ -136,15 +144,19 @@ export const getFirstAssessmentQuestions = async () => {
   return fullyShuffled;
 };
 
-// submt initial assessments
+// submit initial assessments
 export const initialSubmission = async (
   details: InitialAssessmentI,
-  userId: string
+  userId: string,
 ) => {
   const { assessmentType, submissions } = details;
-  console.log(submissions, "submissions");
+
   const { scores, topScores } = await calculateScore(submissions);
-  console.log(topScores, "scoressss");
+
+  const user = await User.findById(userId);
+
+  const isFirstAttempt = !user?.takeInitialAssessment;
+
   const newAssessment = await InitialAssessment.create({
     userId,
     assessmentType,
@@ -153,21 +165,30 @@ export const initialSubmission = async (
     scores,
   });
 
-  const user = await User.findById(userId);
   if (user) {
     user.takeInitialAssessment = true;
     user.intelligenceTypes = topScores;
     await user.save();
   }
 
-  return newAssessment;
+  let reward = null;
+
+  if (isFirstAttempt) {
+    reward = await addRewardPoints({
+      userId,
+      action: "TAKE_INITIAL_ASSESSMENT",
+      points: 5,
+    });
+  }
+
+  return { newAssessment, reward };
 };
 
 export const getInitialAssessmentSubmissions = async (
   limit: number,
   page: number,
   sort: string,
-  search?: string
+  search?: string,
 ) => {
   const skip = (page - 1) * limit;
   const sortOrder = sort === "newest" ? -1 : 1;
@@ -197,7 +218,7 @@ export const getInitialAssessmentSubmissions = async (
 
 // get single intial assessment details
 export const getSingleInitialAssessmentDetails = async (
-  assessmentId: string
+  assessmentId: string,
 ) => {
   if (!assessmentId) throw new CustomError("Plase give assessment id", 400);
   const details = await InitialAssessment.findById(assessmentId);
@@ -213,7 +234,7 @@ export const deleteAssessmentSubmission = async (assessmentId: string) => {
 
 // initial assessment submission delete
 export const deleteInitialAssessmentSubmission = async (
-  assessmentId: string
+  assessmentId: string,
 ) => {
   if (!assessmentId) throw new CustomError("Assessment id needed", 400);
   const assessment = await InitialAssessment.findByIdAndDelete(assessmentId);

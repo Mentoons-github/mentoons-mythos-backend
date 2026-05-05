@@ -1,17 +1,15 @@
 import { Types } from "mongoose";
 
 export interface IReply {
+  commentId: Types.ObjectId;
   userId: Types.ObjectId;
-  username: string;
-  profile?: string;
+  replyToUserId: Types.ObjectId;
   replyText: string;
 }
 
 export interface IComment extends Document {
   blogId: Types.ObjectId;
   userId: Types.ObjectId;
-  username: string;
-  profile:string;
   comment: string;
-  reply:IReply[]
+  replyCount: number;
 }

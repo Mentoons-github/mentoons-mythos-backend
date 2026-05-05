@@ -10,8 +10,9 @@ export const assessmentSubmission = catchAsync(async (req, res) => {
   );
   res.status(201).json({
     success: true,
-    message: `Assessment submitted for ${assessment.assessmentName}`,
-    assessment,
+    message: `Assessment submitted for ${assessment.submittedDetails.assessmentName}`,
+    assessment: assessment.submittedDetails,
+    reward: assessment.reward,
   });
 });
 
@@ -43,9 +44,11 @@ export const getAllAssessments = catchAsync(async (req, res) => {
     sort,
     search
   );
-  res
-    .status(200)
-    .json({ message: "Fetched all assessments", success: true, ...assessments });
+  res.status(200).json({
+    message: "Fetched all assessments",
+    success: true,
+    ...assessments,
+  });
 });
 
 //get Single submission
@@ -71,6 +74,8 @@ export const initialSubmission = catchAsync(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Successfully submitted the assessment",
+    details: details.newAssessment,
+    reward: details.reward,
   });
 });
 
@@ -107,15 +112,21 @@ export const getSingleInitialAssessmentDetails = catchAsync(
 );
 
 //delete assessmet submision
-export const deleteAssessmentSubmission = catchAsync(async(req,res) => {
-  const {assessmentId} = req.params
-  await assessmentService.deleteAssessmentSubmission(assessmentId)
-  res.status(200).json({message:"Assessment submitted details successfully deleted"})
-})
+export const deleteAssessmentSubmission = catchAsync(async (req, res) => {
+  const { assessmentId } = req.params;
+  await assessmentService.deleteAssessmentSubmission(assessmentId);
+  res
+    .status(200)
+    .json({ message: "Assessment submitted details successfully deleted" });
+});
 
 //delete initial assessmet submision
-export const deleteInitialAssessmentSubmission = catchAsync(async(req,res) => {
-  const {assessmentId} = req.params
-  await assessmentService.deleteInitialAssessmentSubmission(assessmentId)
-  res.status(200).json({message:"Assessment submitted details successfully deleted"})
-})
+export const deleteInitialAssessmentSubmission = catchAsync(
+  async (req, res) => {
+    const { assessmentId } = req.params;
+    await assessmentService.deleteInitialAssessmentSubmission(assessmentId);
+    res
+      .status(200)
+      .json({ message: "Assessment submitted details successfully deleted" });
+  }
+);
