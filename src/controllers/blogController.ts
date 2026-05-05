@@ -4,7 +4,9 @@ import * as blogServices from "../services/blogServices";
 //create blog
 export const createBlog = catchAsync(async (req, res) => {
   const blog = await blogServices.createBlog(req.body, req.user._id);
-  res.status(201).json({ message: "Blog Created", blog });
+  res
+    .status(201)
+    .json({ message: "Blog Created", blog: blog.blog, reward: blog.reward });
 });
 
 //fetch blog
@@ -14,7 +16,12 @@ export const fetchBlog = catchAsync(async (req, res) => {
   const sort = (req.query.sort as "newest" | "oldest") || "newest";
   const search = (req.query.search as string) || "";
 
-  const { blogs, total } = await blogServices.fetchBlog(skip, limit, sort, search);
+  const { blogs, total } = await blogServices.fetchBlog(
+    skip,
+    limit,
+    sort,
+    search
+  );
   res.status(200).json({
     message: "Successfully fetched blogs",
     blogs,
@@ -24,10 +31,10 @@ export const fetchBlog = catchAsync(async (req, res) => {
 });
 
 //fetch blog count
-export const fetchBlogCount = catchAsync(async(req,res) => {
-  const count = await blogServices.fetchBlogCount()
-  res.status(200).json({message:"Blog count fetched", count})
-})
+export const fetchBlogCount = catchAsync(async (req, res) => {
+  const count = await blogServices.fetchBlogCount();
+  res.status(200).json({ message: "Blog count fetched", count });
+});
 
 //fetch single blog
 export const fetchSingleBlog = catchAsync(async (req, res) => {

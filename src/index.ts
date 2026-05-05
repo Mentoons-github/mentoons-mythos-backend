@@ -17,7 +17,8 @@ import "./utils/MarkAbsentAttendance";
 //router
 import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
-import blogRoutes from "./routes/blog.routes";
+// import blogRoutes from "./routes/blog.routes";
+import blogRoutes from "./routes/blogV2.routes";
 import uploadRoutes from "./routes/upload.routes";
 import astrologyRoutes from "./routes/astrology.routes";
 import chatRoutes from "./routes/chat.routes";
@@ -38,6 +39,7 @@ import notificationRoutes from "./routes//notification.route";
 
 //employee router
 import employeeRoutes from "./routes/employee.routes";
+import { dailyVisitReward } from "./middlewares/dailyRewardMiddleware";
 
 const app = express();
 app.use(morgan("dev"));
@@ -50,6 +52,7 @@ app.use(
       config.FRONTEND_URL,
       "https://mentoonsmythos.com",
       "http://localhost:5173",
+      "https://mentoons-mythos-frontend.vercel.app",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -59,12 +62,13 @@ app.use(
       "Access-Control-Allow-Origin",
     ],
     credentials: true,
-  })
+  }),
 );
 
 DBConnection();
 
 const PORT = config.PORT || 3000;
+app.use(dailyVisitReward);
 app.use(passport.initialize());
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/user", userRoutes);

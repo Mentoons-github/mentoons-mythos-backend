@@ -11,6 +11,7 @@ export const fetchUser = catchAsync(async (req, res) => {
   res.status(200).json({
     success: true,
     user,
+    reward: res.locals.reward || null,
   });
 });
 

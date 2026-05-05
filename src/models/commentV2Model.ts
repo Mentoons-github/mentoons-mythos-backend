@@ -19,13 +19,9 @@ const commentSchema = new Schema<IComment>(
       type: String,
       required: true,
     },
-    replyCount: {
-      type: Number,
-      default: 0,
-    },
   },
   { timestamps: true },
 );
 
-const Comment = mongoose.model<ICommentDocument>("Comment", commentSchema);
-export default Comment;
+const CommentV2 = mongoose.model<ICommentDocument>("CommentV2", commentSchema);
+export default CommentV2;
