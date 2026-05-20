@@ -23,6 +23,12 @@ export interface IUser {
   designation: string;
   rewardPoints: number;
   lastDailyReward: Date;
+  badges: {
+    badge: Types.ObjectId;
+    earnedAt?: Date;
+    isCollected?: boolean;
+    isDeleted?: boolean;
+  }[];
 }
 
 export interface AstroReport {

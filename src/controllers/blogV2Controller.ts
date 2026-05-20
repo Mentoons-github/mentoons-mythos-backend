@@ -3,10 +3,11 @@ import * as blogServicesV2 from "../services/blogV2Sevices";
 
 //create blog post
 export const createBlogV2 = catchAsync(async (req, res) => {
-  const blog = await blogServicesV2.createBlogV2(req.body, req.user._id);
-  res
-    .status(201)
-    .json({ message: "Blog Created", blog: blog.blog, reward: blog.reward });
+  const { blog, badge, reward } = await blogServicesV2.createBlogV2(
+    req.body,
+    req.user._id,
+  );
+  res.status(201).json({ message: "Blog Created", blog, reward, badge });
 });
 
 //get blog post
@@ -28,6 +29,12 @@ export const fetchBlogV2 = catchAsync(async (req, res) => {
     total,
     // userId:req.user._id
   });
+});
+
+//fetch single blog
+export const fetchSingleBlogV2 = catchAsync(async (req, res) => {
+  const blog = await blogServicesV2.fetchSingleBlogV2(req.params.blogId);
+  res.status(200).json({ message: "Single blog fetched", blog: blog.blog });
 });
 
 //like blog
@@ -145,4 +152,12 @@ export const commentOffToggle = catchAsync(async (req, res) => {
     success: true,
     message: `Comment successfully turned ${updatedValue}`,
   });
+});
+
+//userblogs
+export const fetchUserBlogsV2 = catchAsync(async (req, res) => {
+  const userId = req.user._id;
+  console.log(userId);
+  const blogs = await blogServicesV2.userBlogV2(userId);
+  res.status(200).json({ message: "Blogs fetched successfully", blogs });
 });

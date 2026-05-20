@@ -8,8 +8,14 @@ import User from "../models/userModel";
 import Comment from "../models/commentModel";
 import Report from "../models/ReportModel";
 import CommentReply from "../models/commentReplyModel";
+import Badge from "../models/badgeModel";
+import { assignBadge } from "./badgeService";
 
 export const createBlogV2 = async (data: IBlogV2, userId: string) => {
+  const existingPostCount = await BlogV2.countDocuments({
+    user: new Types.ObjectId(userId),
+  });
+
   const blog = await BlogV2.create({
     postType: data.postType,
     media: data.media,
@@ -20,6 +26,19 @@ export const createBlogV2 = async (data: IBlogV2, userId: string) => {
     content: data.content,
     tags: Array.isArray(data.tags) ? data.tags.map((tag) => tag.trim()) : [],
   });
+
+  const isFirstPost = existingPostCount === 0;
+  let badge = null;
+
+  if (isFirstPost) {
+    badge = await Badge.findOne({
+      "criteria.action": "post_created",
+    });
+  }
+
+  if (badge) {
+    await assignBadge(userId, badge._id);
+  }
 
   const reward = await addRewardPoints({
     userId,
@@ -32,9 +51,10 @@ export const createBlogV2 = async (data: IBlogV2, userId: string) => {
     "firstName lastName profilePicture",
   );
 
-  return { blog: populatedBlog, reward };
+  return { blog: populatedBlog, reward, badge };
 };
 
+//feth blog
 export const fetchBlogV2 = async (
   skip: number,
   limit: number,
@@ -60,6 +80,27 @@ export const fetchBlogV2 = async (
   const total = await BlogV2.countDocuments(query);
 
   return { blogs, total };
+};
+
+//fetch single blog
+export const fetchSingleBlogV2 = async (blogId: string) => {
+  const blog = await BlogV2.findById(blogId).populate(
+    "user",
+    "firstName lastName profilePicture",
+  );
+  if (!blog) throw new Error("Blog not found");
+
+  const reports = await Report.find({ fromId: blogId });
+
+  const updatedBlog = {
+    ...blog.toObject(),
+    reportLength: reports.length,
+  };
+
+  return {
+    blog: updatedBlog,
+    reports,
+  };
 };
 
 //like blog
@@ -107,18 +148,15 @@ export const addCommentV2 = async (
     points: 3,
     postId: blogId,
   });
-
   await BlogV2.findByIdAndUpdate(
     blogId,
     { $inc: { commentCount: 1 } },
     { new: true },
   );
-
   const populatedComment = await Comment.findById(newComment._id).populate({
     path: "userId",
     select: "firstName lastName profilePicture",
   });
-
   return { newComment: populatedComment, reward };
 };
 
@@ -221,6 +259,15 @@ export const getReplyCommentsV2 = async (
 
 //deleteBlog
 export const deleteBlogV2 = async (blogId: string, userId: string) => {
+  const user = await User.findById(userId);
+  const blog = await BlogV2.findById(blogId);
+
+  const isOwner = blog?.user?.toString() === user?._id?.toString();
+  const isAdmin = user?.role === "admin";
+
+  if (!isOwner && !isAdmin) {
+    throw new CustomError("You can't delete this blog", 400);
+  }
   const deletedBlog = await BlogV2.findByIdAndDelete(blogId);
   const reward = await addRewardPoints({
     userId,
@@ -281,7 +328,6 @@ export const editCommentV2 = async (commentId: string, newComment: string) => {
   if (updated) {
     return { type: "comment", updated };
   }
-
   updated = await CommentReply.findByIdAndUpdate(
     commentId,
     { replyText: newComment },
@@ -290,10 +336,10 @@ export const editCommentV2 = async (commentId: string, newComment: string) => {
   if (updated) {
     return { type: "replyComment", updated };
   }
-
   throw new CustomError("Comment or Reply not found", 400);
 };
 
+//comment off
 export const commentOffToggle = async (blogId: string) => {
   const post = await BlogV2.findById(blogId);
   if (!post) {
@@ -302,4 +348,11 @@ export const commentOffToggle = async (blogId: string) => {
   post.commentsOff = !post.commentsOff;
   await post.save();
   return post;
+};
+
+//user blog
+export const userBlogV2 = async (userId: string) => {
+  const blogs = await BlogV2.find({ user: userId });
+  console.log("blogs data :", blogs);
+  return blogs;
 };

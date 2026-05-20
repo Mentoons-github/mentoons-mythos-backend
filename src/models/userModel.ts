@@ -3,7 +3,7 @@ import { IUser } from "../interfaces/userInterface";
 import { Types } from "mongoose";
 
 export interface IUserDocument extends IUser, Document {
-  _id: Types.ObjectId;   
+  _id: Types.ObjectId;
 }
 
 const astroSchema = new mongoose.Schema(
@@ -46,7 +46,7 @@ const astroSchema = new mongoose.Schema(
     },
     lastGenerated: { type: Date },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const userSchema = new mongoose.Schema<IUserDocument>(
@@ -140,8 +140,28 @@ const userSchema = new mongoose.Schema<IUserDocument>(
       type: Date,
       default: null,
     },
+    badges: [
+      {
+        badge: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Badge",
+        },
+        earnedAt: {
+          type: Date,
+          default: Date.now,
+        },
+        isCollected: {
+          type: Boolean,
+          default: false,
+        },
+        isDeleted: {
+          type: Boolean,
+          default: false,
+        },
+      },
+    ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const User = mongoose.model<IUserDocument>("User", userSchema);
 
