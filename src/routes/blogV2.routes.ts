@@ -8,6 +8,8 @@ import {
   deleteCommentV2,
   editCommentV2,
   fetchBlogV2,
+  fetchSingleBlogV2,
+  fetchUserBlogsV2,
   getCommentsV2,
   getReplyCommentsV2,
   replyCommentV2,
@@ -17,7 +19,8 @@ import {
 const routes = express.Router();
 
 routes.post("/create", userAuth, createBlogV2);
-routes.get("/get", userAuth, fetchBlogV2);
+routes.get("/get", fetchBlogV2);
+routes.get("/get/:blogId", userAuth, fetchSingleBlogV2);
 routes.patch("/:blogId/like", userAuth, toggleLikeV2);
 routes.post("/:blogId/comment/post-comments", userAuth, addCommentV2);
 routes.get("/:blogId/comment/get-comments", userAuth, getCommentsV2);
@@ -27,5 +30,6 @@ routes.delete("/delete/:blogId", userAuth, deleteBlogV2);
 routes.delete("/comment/delete/:commentId", userAuth, deleteCommentV2);
 routes.patch("/comment/edit/:commentId", userAuth, editCommentV2);
 routes.patch("/commentoffToggle/:blogId", userAuth, commentOffToggle);
+routes.get("/user", userAuth, fetchUserBlogsV2);
 
 export default routes;

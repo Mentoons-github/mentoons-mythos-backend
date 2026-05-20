@@ -1,16 +1,61 @@
+import { IUser } from "../interfaces/userInterface";
+import Badge from "../models/badgeModel";
+import BlogV2 from "../models/BlogV2Model";
 import User from "../models/userModel";
 import {
   getAstroAccessToken,
   getSunAndMoonSign,
 } from "../services/astrologyService";
+import { assignBadge } from "../services/badgeService";
 import * as userService from "../services/userService";
 import catchAsync from "../utils/cathAsync";
 
 export const fetchUser = catchAsync(async (req, res) => {
-  const user = req.user;
+  const user = req.user as IUser;
+  let unlockedBadge = null;
+
+  // Check if user has a post with 1+ likes
+  const hasLikedPost = await BlogV2.exists({
+    user: user._id,
+    $expr: {
+      $gte: [{ $size: "$likes" }, 1],
+    },
+  });
+
+  if (hasLikedPost) {
+    const badge = await Badge.findOne({
+      "criteria.action": "like_count",
+    });
+
+    if (badge) {
+      const existingBadge = user.badges.find(
+        (b) => b.badge.toString() === badge._id.toString(),
+      );
+
+      if (!existingBadge) {
+        await assignBadge(user._id.toString(), badge._id);
+
+        unlockedBadge = {
+          _id: badge._id,
+          name: badge.name,
+          animation: badge.animation,
+          description: badge.description,
+        };
+      } else if (!existingBadge.isCollected) {
+        unlockedBadge = {
+          _id: badge._id,
+          name: badge.name,
+          animation: badge.animation,
+          description: badge.description,
+        };
+      }
+    }
+  }
+
   res.status(200).json({
     success: true,
     user,
+    badge: unlockedBadge,
     reward: res.locals.reward || null,
   });
 });
@@ -29,7 +74,7 @@ export const fetchAllUsers = catchAsync(async (req, res) => {
     sort,
     search,
     filterBy,
-    filterValue
+    filterValue,
   );
   res.status(200).json({
     success: true,

@@ -34,8 +34,9 @@ import aboutRoutes from "./routes/aboutComment.route";
 import adminRoutes from "./routes/admin.routes";
 import mentorRoutes from "./routes/mentor.routes";
 import careerGpsRoutes from "./routes/careerGps.route";
-
-import notificationRoutes from "./routes//notification.route";
+import notificationRoutes from "./routes/notification.route";
+import quizRoutes from "./routes/quiz.route";
+import badgeRoutes from "./routes/badge.routes";
 
 //employee router
 import employeeRoutes from "./routes/employee.routes";
@@ -88,6 +89,8 @@ app.use("/api/v1/about", aboutRoutes);
 app.use("/api/v1/notification", notificationRoutes);
 app.use("/api/v1/mentor", mentorRoutes);
 app.use("/api/v1/career-gps", careerGpsRoutes);
+app.use("/api/v1/quiz", quizRoutes);
+app.use("/api/v1/badge", badgeRoutes);
 
 app.use("/api/v1/admin", adminRoutes);
 //employee

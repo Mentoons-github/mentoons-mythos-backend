@@ -41,6 +41,8 @@ export const fetchSingleBlog = catchAsync(async (req, res) => {
   const blog = await blogServices.fetchSingleBlog(req.params.blogId);
   res.status(200).json({ message: "Single blog fetched", blog: blog.blog });
 });
+
+//userblogs
 export const fetchUserBlogs = catchAsync(async (req, res) => {
   const userId = req.user._id;
   console.log(userId);
