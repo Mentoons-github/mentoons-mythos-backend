@@ -50,9 +50,12 @@ export const collectBadge = async (badgeId: string, userId: string) => {
   const selectedBadge = user.badges.find(
     (badge) => badge.badge.toString() === badgeId,
   );
+  console.log(selectedBadge,'badgeessss')
   if (!selectedBadge) {
     throw new CustomError("Badge not found", 404);
+
   }
+
   selectedBadge.isCollected = true;
   selectedBadge.isDeleted = false;
   await user.save();

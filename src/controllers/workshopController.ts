@@ -20,16 +20,14 @@ export const getWorkshops = catchAsync(async (req, res) => {
     limit,
     page,
     sort,
-    search
+    search,
   );
 
-  res
-    .status(200)
-    .json({
-      success: true,
-      message: "Workshop successfully fetched",
-      ...workshops,
-    });
+  res.status(200).json({
+    success: true,
+    message: "Workshop successfully fetched",
+    ...workshops,
+  });
 });
 
 //registe workshop
@@ -37,7 +35,7 @@ export const registeWorkshop = catchAsync(async (req, res) => {
   const { workshopId } = req.params;
   const workshopDetails = await WorkshopService.registeWorkshop(
     req.body,
-    workshopId
+    workshopId,
   );
   res.status(201).json({
     success: true,
@@ -56,7 +54,7 @@ export const getEnquiries = catchAsync(async (req, res) => {
     page,
     limit,
     sort,
-    search
+    search,
   );
   res
     .status(200)
@@ -71,7 +69,9 @@ export const fetchWorkshopCount = catchAsync(async (req, res) => {
 
 //get single workshop
 export const getSingleWorkshop = catchAsync(async (req, res) => {
-  const workshop = await WorkshopService.getSingleWorkshop(req.params.workshopId);
+  const workshop = await WorkshopService.getSingleWorkshop(
+    req.params.workshopId,
+  );
   res.status(200).json({
     success: true,
     message: "Single Workshop details fetched",
@@ -88,11 +88,18 @@ export const deleteWorkshop = catchAsync(async (req, res) => {
 });
 
 //edit workshop
-export const updateWorkshop = catchAsync(async(req,res) => {
-  const {workshopId} = req.params
-  const editedWorkshop = await WorkshopService.updateWorkshop(req.body,workshopId)
-  res.status(200).json({success:true, message:"Workshop successfully updated", editedWorkshop})
-})
+export const updateWorkshop = catchAsync(async (req, res) => {
+  const { workshopId } = req.params;
+  const editedWorkshop = await WorkshopService.updateWorkshop(
+    req.body,
+    workshopId,
+  );
+  res.status(200).json({
+    success: true,
+    message: "Workshop successfully updated",
+    editedWorkshop,
+  });
+});
 
 //enquiry count
 export const fetchEnquiryCount = catchAsync(async (req, res) => {
@@ -118,3 +125,32 @@ export const deleteEnquiry = catchAsync(async (req, res) => {
     .json({ success: true, message: "Enquiry Successfully deleted" });
 });
 
+//get workshop plans
+export const getWorkshopPlans = catchAsync(async (req, res) => {
+  const plans = await WorkshopService.getWorkshopPlans();
+  res
+    .status(200)
+    .json({ success: true, messsage: "Workshop plans fetched", plans });
+});
+
+// create workshop plan
+export const createWorkshopPlan = catchAsync(async (req, res) => {
+  const data = req.body;
+  const newPlan = await WorkshopService.createWorkshopPlan(data);
+  res.status(201).json({ message: "New workshop plan added", newPlan });
+});
+
+//delete workshop plan
+export const deleteWorkshopPlan = catchAsync(async (req, res) => {
+  const { planId } = req.params;
+  await WorkshopService.deleteWorkshopPlan(planId);
+  res.status(200).json({ message: "Workshop plan deleted" });
+});
+
+//edit workshop plan
+export const editWorkshopPlan = catchAsync(async (req, res) => {
+  const { planId } = req.params;
+  const data = req.body;
+  const editedPlan = await WorkshopService.editWorkshopPlan(planId, data);
+  res.status(200).json({ message: "Workshop plan updated", editedPlan });
+});

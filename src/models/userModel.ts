@@ -160,6 +160,12 @@ const userSchema = new mongoose.Schema<IUserDocument>(
         },
       },
     ],
+    savedPosts: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "BlogV2",
+      },
+    ],
   },
   { timestamps: true },
 );

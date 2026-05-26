@@ -162,7 +162,6 @@ export const checkRashiStatus = catchAsync(async (req, res) => {
   const userId = req.user._id;
   const hasRashi = await userHasRashi(userId);
     res.status(200).json(hasRashi);
- 
 });
 
 const isSignType = (value: unknown): value is SignType => {

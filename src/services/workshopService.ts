@@ -1,9 +1,14 @@
 import mongoose from "mongoose";
-import { IEnquiry, IWorkshop } from "../interfaces/workshopInterface";
+import {
+  IEnquiry,
+  IWorkshop,
+  IWorkshopPlan,
+} from "../interfaces/workshopInterface";
 import Enquiry from "../models/EnquiryModel";
 import Workshop from "../models/workshopModel";
 import { RegisterWorkshopMail } from "../utils/bookCallMail";
 import CustomError from "../utils/customError";
+import WorkshopPlan from "../models/WorkshopPlanModel";
 
 // add new workshop
 export const addWorkshop = async (details: IWorkshop) => {
@@ -23,7 +28,7 @@ export const getWorkshops = async (
   limit: number,
   page: number,
   sort: string,
-  search?: string
+  search?: string,
 ) => {
   const skip = (page - 1) * limit;
   const query: any = {};
@@ -50,7 +55,7 @@ export const getWorkshops = async (
 // register workshop
 export const registeWorkshop = async (
   details: IEnquiry,
-  workshopId: string
+  workshopId: string,
 ) => {
   const {
     userId,
@@ -91,7 +96,7 @@ export const getEnquiries = async (
   page: number,
   limit: number,
   sort: string,
-  search?: string
+  search?: string,
 ) => {
   const skip = (page - 1) * limit;
 
@@ -149,7 +154,7 @@ export const updateWorkshop = async (data: IWorkshop, workshopId: string) => {
       focus: data.focus,
       img: data.img,
     },
-    { new: true, runValidators: true }
+    { new: true, runValidators: true },
   );
 
   if (!updated) throw new CustomError("Workshop not found", 400);
@@ -175,4 +180,48 @@ export const deleteEnquiry = async (enquiryId: string) => {
   const deleted = await Enquiry.findByIdAndDelete(enquiryId);
   if (!deleted) throw new CustomError("Invalid enquiry id", 400);
   return deleted;
+};
+
+//get workshop plan
+export const getWorkshopPlans = async () => {
+  const workshopPlans = await WorkshopPlan.find().sort({ createdAt: -1 });
+  return workshopPlans;
+};
+
+// create new workshop plan
+export const createWorkshopPlan = async (data: IWorkshopPlan) => {
+  if (!data) {
+    throw new CustomError("Plan details required", 400);
+  }
+  const newPlan = new WorkshopPlan(data);
+  newPlan.save();
+  return newPlan;
+};
+
+//delete workshop plan
+export const deleteWorkshopPlan = async (planId: string) => {
+  const deleted = await WorkshopPlan.findByIdAndDelete(planId);
+  if (!deleted) throw new CustomError("Workshop not found", 400);
+  return deleted;
+};
+
+//edit workshop plan
+export const editWorkshopPlan = async (planId: string, data: IWorkshopPlan) => {
+  const edited = await WorkshopPlan.findByIdAndUpdate(
+    planId,
+    {
+      title: data.title,
+      months: data.months,
+      duration: data.duration,
+      price: data.price,
+      totalSessions: data.totalSessions,
+      ageGroups: data.ageGroups,
+      mode: data.mode,
+      features: data.features,
+      materials: data.materials,
+      highlight: data.highlight,
+    },
+    { new: true, runValidators: true },
+  );
+  return edited;
 };

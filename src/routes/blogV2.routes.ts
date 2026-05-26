@@ -13,7 +13,9 @@ import {
   getCommentsV2,
   getReplyCommentsV2,
   replyCommentV2,
+  saveBlogV2,
   toggleLikeV2,
+  userSavedBlogsV2,
 } from "../controllers/blogV2Controller";
 
 const routes = express.Router();
@@ -31,5 +33,7 @@ routes.delete("/comment/delete/:commentId", userAuth, deleteCommentV2);
 routes.patch("/comment/edit/:commentId", userAuth, editCommentV2);
 routes.patch("/commentoffToggle/:blogId", userAuth, commentOffToggle);
 routes.get("/user", userAuth, fetchUserBlogsV2);
+routes.patch("/save/:blogId", userAuth, saveBlogV2);
+routes.get("/user/saved", userAuth, userSavedBlogsV2)
 
 export default routes;

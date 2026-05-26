@@ -2,13 +2,17 @@ import express from "express";
 import userAuth from "../middlewares/authMiddleware";
 import {
   addWorkshop,
+  createWorkshopPlan,
   deleteEnquiry,
   deleteWorkshop,
+  deleteWorkshopPlan,
+  editWorkshopPlan,
   fetchEnquiryCount,
   fetchWorkshopCount,
   getEnquiries,
   getEnquiryById,
   getSingleWorkshop,
+  getWorkshopPlans,
   getWorkshops,
   registeWorkshop,
   updateWorkshop,
@@ -27,5 +31,9 @@ routes.put("/edit/:workshopId", userAuth, updateWorkshop);
 routes.get("/enquiries/get/count", userAuth, fetchEnquiryCount);
 routes.get("/enquiries/:enquiryId", userAuth, getEnquiryById);
 routes.delete("/enquiries/delete/:enquiryId", userAuth, deleteEnquiry);
+routes.get("/plans/get", getWorkshopPlans);
+routes.post("/plans/new", userAuth, createWorkshopPlan);
+routes.delete("/plan/delete/:planId", userAuth, deleteWorkshopPlan);
+routes.patch("/plan/edit/:planId",userAuth, editWorkshopPlan)
 
 export default routes;

@@ -29,6 +29,7 @@ export interface IUser {
     isCollected?: boolean;
     isDeleted?: boolean;
   }[];
+  savedPosts: Types.ObjectId[];
 }
 
 export interface AstroReport {
