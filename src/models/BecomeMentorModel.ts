@@ -34,11 +34,11 @@ const mentorSchema = new mongoose.Schema<IMentorDocument>(
       required: true,
     },
     mobileNumber: {
-      type: Number,
+      type: String,
       required: true,
     },
     whatsappNumber: {
-      type: Number,
+      type: String,
       required: true,
     },
     resume: {

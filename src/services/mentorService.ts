@@ -28,7 +28,7 @@ export const submitMentorForm = async (userId: string, form: IMentor) => {
   ApplyJobMail({
     name: `${form.firstName} ${form.lastName}`,
     email: form.email,
-    mobileNumber: form.mobileNumber,
+    mobileNumber: Number(form.mobileNumber),
     position: form.mentorType,
   });
 

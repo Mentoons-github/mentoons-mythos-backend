@@ -353,6 +353,47 @@ export const commentOffToggle = async (blogId: string) => {
 //user blog
 export const userBlogV2 = async (userId: string) => {
   const blogs = await BlogV2.find({ user: userId });
-  console.log("blogs data :", blogs);
   return blogs;
+};
+
+import mongoose from "mongoose";
+
+//save blog
+export const saveBlogV2 = async (userId: string, blogId: string) => {
+  const user = await User.findById(userId);
+  if (!user) {
+    throw new CustomError("User not found", 400);
+  }
+
+  const isSaved = user.savedPosts.some((post) => post.toString() === blogId);
+
+  if (isSaved) {
+    user.savedPosts = user.savedPosts.filter(
+      (post) => post.toString() !== blogId,
+    );
+  } else {
+    user.savedPosts.push(new mongoose.Types.ObjectId(blogId));
+  }
+
+  await user.save();
+
+  return {
+    success: true,
+    saved: !isSaved,
+    savedPosts: user.savedPosts,
+  };
+};
+
+// user saved blogs
+export const userSavedBlogsV2 = async (userId: string) => {
+  const user = await User.findById(userId).populate({
+    path: "savedPosts",
+    options: { sort: { createdAt: -1 } },
+  });
+
+  if (!user) {
+    throw new CustomError("User not found", 400);
+  }
+
+  return user.savedPosts;
 };

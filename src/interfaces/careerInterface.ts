@@ -33,8 +33,8 @@ export interface IMentor {
   firstName: string;
   lastName: string;
   email: string;
-  mobileNumber: number;
-  whatsappNumber: number;
+  mobileNumber: string;
+  whatsappNumber: string;
   resume: string;
   age: number;
   gender: string;

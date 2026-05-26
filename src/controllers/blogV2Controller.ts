@@ -157,7 +157,25 @@ export const commentOffToggle = catchAsync(async (req, res) => {
 //userblogs
 export const fetchUserBlogsV2 = catchAsync(async (req, res) => {
   const userId = req.user._id;
-  console.log(userId);
   const blogs = await blogServicesV2.userBlogV2(userId);
   res.status(200).json({ message: "Blogs fetched successfully", blogs });
+});
+
+//save post
+export const saveBlogV2 = catchAsync(async (req, res) => {
+  const { blogId } = req.params;
+  const userId = req.user._id;
+  const { saved } = await blogServicesV2.saveBlogV2(userId, blogId);
+  res.status(200).json({
+    message: saved ? "Blog added to save list" : "Blog removed from save list",
+    saved,
+    blogId,
+  });
+});
+
+// user saved blogs
+export const userSavedBlogsV2 = catchAsync(async (req, res) => {
+  const userId = req.user._id;
+  const savedPosts = await blogServicesV2.userSavedBlogsV2(userId);
+  res.status(200).json({ message: "Saved blogs fetched", savedPosts });
 });

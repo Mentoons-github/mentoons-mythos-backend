@@ -5,7 +5,6 @@ import catchAsync from "../utils/cathAsync";
 export const createBadge = catchAsync(async (req, res) => {
   const data = req.body;
   const badge = await BadgeService.createBadge(data);
-  console.log(badge,'dddddd')
   res.status(200).json({ message: "Badge created successfully", badge });
 });
 
@@ -60,6 +59,7 @@ export const editBadge = catchAsync(async (req, res) => {
   res.status(200).json({ message: "Badge edited", editedBadge });
 });
 
+//fetch animation
 export const fetchBadgeAnimation = catchAsync(async (req, res) => {
   const { badgeId } = req.params;
   const animation = await BadgeService.fetchBadgeAnimation(badgeId);
