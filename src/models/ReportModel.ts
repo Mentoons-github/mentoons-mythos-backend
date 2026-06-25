@@ -1,16 +1,17 @@
 import mongoose, { Schema } from "mongoose";
 import { IReport } from "../interfaces/reportInterface";
 
-const reportSchema: Schema = new Schema <IReport>(
+const reportSchema: Schema = new Schema<IReport>(
   {
-    from: {
+    targetType: {
       type: String,
       required: true,
     },
-    fromId: {
+    targetId: {
       type: String,
+      required: true,
     },
-    userId: {
+    reportedUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
@@ -24,8 +25,18 @@ const reportSchema: Schema = new Schema <IReport>(
       type: String,
       required: true,
     },
+    status: {
+      type: String,
+      enum: ["pending", "reviewed", "resolved", "rejected"],
+      default: "pending",
+    },
+    actionTaken: {
+      type: String,
+      enum: ["none", "deleted", "hidden", "warning_sent", "user_banned"],
+      default: "none",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Report = mongoose.model<IReport>("Report", reportSchema);

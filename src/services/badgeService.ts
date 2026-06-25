@@ -7,6 +7,7 @@ import axios from "axios";
 
 export const createBadge = async (data: IBadge) => {
   const badge = await Badge.create(data);
+  badge.save()
   return badge;
 };
 

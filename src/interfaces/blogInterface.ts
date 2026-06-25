@@ -34,11 +34,12 @@ export interface IBlogV2 {
     description: string;
   };
   article?: {
-    title:string
+    title: string;
     body: string;
   };
   likes?: mongoose.Types.ObjectId[];
   commentsOff: boolean;
   viewers: mongoose.Types.ObjectId[];
   commentCount: number;
+  moderationStatus: "active" | "hidden" | "deleted" | "ignore";
 }

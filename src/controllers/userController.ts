@@ -194,10 +194,10 @@ export const reportUser = catchAsync(async (req, res) => {
   const { reason, from, fromId } = req.body;
   const report = await userService.reportUser({
     reportedBy,
-    userId,
-    fromId,
+    reportedUser:userId,
+    targetId:fromId,
     reason,
-    from,
+    targetType:from,
   });
 
   res.status(201).json({ message: "Report Submitted", report });

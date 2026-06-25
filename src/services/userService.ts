@@ -4,6 +4,7 @@ import { IUser } from "../interfaces/userInterface";
 import Report from "../models/ReportModel";
 import _ from "lodash";
 import Blog from "../models/blogModel";
+import { IReport } from "../interfaces/reportInterface";
 
 //fetch all users
 export const fetchAllUsers = async (
@@ -12,7 +13,7 @@ export const fetchAllUsers = async (
   sort: "newest" | "oldest" = "newest",
   search?: string,
   filterBy?: string,
-  filterValue?: string
+  filterValue?: string,
 ) => {
   const skip = (page - 1) * limit;
   const query: any = {};
@@ -76,7 +77,7 @@ export const blockUser = async (userId: string, currentUserId: string) => {
   const updatedUser = await User.findByIdAndUpdate(
     userId,
     { isBlocked: !user.isBlocked },
-    { new: true }
+    { new: true },
   );
 
   return updatedUser;
@@ -122,40 +123,40 @@ export const UserUpdate = async ({
 //report user
 export const reportUser = async ({
   reportedBy,
-  userId,
-  fromId,
+  reportedUser,
+  targetId,
   reason,
-  from,
+  targetType,
 }: {
   reportedBy: string;
-  userId: string;
-  fromId?: string;
+  reportedUser: string;
+  targetId: string;
   reason: string;
-  from: string;
+  targetType: string;
 }) => {
-  if (reportedBy == userId) {
+  if (reportedBy == reportedUser) {
     throw new CustomError("You cant report Yourself", 400);
   }
   const existingReport = await Report.findOne({
     reportedBy,
-    userId,
-    from,
-    fromId: fromId || null,
+    reportedUser,
+    targetType,
+    targetId: targetId || null,
   });
 
   if (existingReport) {
     console.log(existingReport, "existing");
     throw new CustomError(
       "You've already reported this from the same source",
-      400
+      400,
     );
   }
   const report = await Report.create({
     reportedBy,
-    userId,
-    fromId,
+    reportedUser,
+    targetId,
     reason,
-    from,
+    targetType,
   });
 
   return report;

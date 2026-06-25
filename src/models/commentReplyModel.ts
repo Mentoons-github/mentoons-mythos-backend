@@ -7,7 +7,7 @@ const replySchema = new Schema<IReply>(
   {
     commentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Comment",
+      ref: "CommentV2",
       required: true,
     },
     userId: {

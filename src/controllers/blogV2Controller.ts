@@ -16,11 +16,22 @@ export const fetchBlogV2 = catchAsync(async (req, res) => {
   const limit = parseInt(req.query.limit as string) || 5;
   const sort = (req.query.sort as "newest" | "oldest") || "newest";
   const search = (req?.query?.search as string) || "";
+  let isAdmin = false;
+  if (req?.user?.role === "admin") {
+    isAdmin = true;
+  }
+
+  let currentUser = null;
+  if (req.user) {
+    currentUser = req?.user?.userId;
+  }
 
   const { blogs, total } = await blogServicesV2.fetchBlogV2(
     skip,
     limit,
     sort,
+    isAdmin,
+    currentUser,
     search,
   );
   res.status(200).json({
@@ -69,7 +80,12 @@ export const getCommentsV2 = catchAsync(async (req, res) => {
   const skip = parseInt(req.query.skip as string) || 0;
   const limit = parseInt(req.query.limit as string) || 15;
   const { blogId } = req.params;
+  let isAdmin = false;
+  if (req?.user?.role === "admin") {
+    isAdmin = true;
+  }
   const { comments, total } = await blogServicesV2.getCommentsV2(
+    isAdmin,
     blogId,
     skip,
     limit,
@@ -97,10 +113,15 @@ export const getReplyCommentsV2 = catchAsync(async (req, res) => {
   const { commentId } = req.params;
   const skip = parseInt(req.query.skip as string) || 0;
   const limit = parseInt(req.query.limit as string) || 15;
+  let isAdmin = false;
+  if (req?.user?.role === "admin") {
+    isAdmin = true;
+  }
   const { replyComments, total } = await blogServicesV2.getReplyCommentsV2(
     commentId,
     skip,
     limit,
+    isAdmin,
   );
   res
     .status(200)
@@ -178,4 +199,12 @@ export const userSavedBlogsV2 = catchAsync(async (req, res) => {
   const userId = req.user._id;
   const savedPosts = await blogServicesV2.userSavedBlogsV2(userId);
   res.status(200).json({ message: "Saved blogs fetched", savedPosts });
+});
+
+// handle blog actions
+export const takeBlogActions = catchAsync(async (req, res) => {
+  const { blogId, action, days } = req.body;
+  const result = await blogServicesV2.takeBlogActions(blogId, action, days);
+
+  res.status(200).json(result);
 });

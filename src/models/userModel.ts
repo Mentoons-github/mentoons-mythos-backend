@@ -166,6 +166,20 @@ const userSchema = new mongoose.Schema<IUserDocument>(
         ref: "BlogV2",
       },
     ],
+    warningCount: {
+      type: Number,
+      default: 0,
+    },
+    warnings: [
+      {
+        reason: String,
+        createdAt: Date,
+      },
+    ],
+    bannedUntil: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );

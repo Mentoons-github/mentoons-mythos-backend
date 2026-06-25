@@ -24,7 +24,7 @@ export const generateRefreshToken = (
 ): string => {
   const JWT_SECRET_KEY = config.JWT_SECRET_KEY as string;
   const payload = { userId, role };
-  return jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: "7d" });
+  return jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: "30d" });
 };
 
 export const verifyRefreshToken = (token: string): Itoken => {
