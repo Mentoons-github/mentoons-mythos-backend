@@ -10,6 +10,9 @@ import Report from "../models/ReportModel";
 import CommentReply from "../models/commentReplyModel";
 import Badge from "../models/badgeModel";
 import { assignBadge } from "./badgeService";
+import mongoose from "mongoose";
+import { BlogActionMail } from "../utils/blogActionMail";
+import Block from "../models/blockModel";
 
 export const createBlogV2 = async (data: IBlogV2, userId: string) => {
   const existingPostCount = await BlogV2.countDocuments({
@@ -59,6 +62,8 @@ export const fetchBlogV2 = async (
   skip: number,
   limit: number,
   sort: string,
+  isAdmin: boolean,
+  currentUserId: string,
   search?: string,
 ) => {
   const query: any = {};
@@ -68,6 +73,24 @@ export const fetchBlogV2 = async (
       { title: { $regex: search, $options: "i" } },
       { tags: { $regex: search, $options: "i" } },
     ];
+  }
+
+  if (!isAdmin) {
+    query.moderationStatus = "active";
+  }
+
+  if (currentUserId) {
+    const blockedUsers = await Block.find({
+      blockedBy: currentUserId,
+    }).select("blockedUser");
+
+    const blockedUserIds = blockedUsers.map((block) => block.blockedUser);
+
+    if (blockedUserIds.length > 0) {
+      query.user = {
+        $nin: blockedUserIds,
+      };
+    }
   }
 
   const sortOrder = sort === "newest" ? -1 : 1;
@@ -162,11 +185,19 @@ export const addCommentV2 = async (
 
 //get comments
 export const getCommentsV2 = async (
+  isAdmin: boolean,
   blogId: string,
   skip: number,
   limit: number,
 ) => {
-  const comments = await Comment.find({ blogId })
+  const query: any = {
+    blogId,
+  };
+
+  // if (!isAdmin) {
+  //   query.moderationStatus = "active";
+  // }
+  const comments = await Comment.find(query)
     .populate({
       path: "userId",
       select: "firstName lastName profilePicture",
@@ -238,7 +269,15 @@ export const getReplyCommentsV2 = async (
   commentId: string,
   skip: number,
   limit: number,
+  isAdmin: boolean,
 ) => {
+  const query: any = {
+    commentId,
+  };
+
+  // if (!isAdmin) {
+  //   query.moderationStatus = "active";
+  // }
   const replyComments = await CommentReply.find({ commentId })
     .populate({
       path: "userId",
@@ -269,12 +308,12 @@ export const deleteBlogV2 = async (blogId: string, userId: string) => {
     throw new CustomError("You can't delete this blog", 400);
   }
   const deletedBlog = await BlogV2.findByIdAndDelete(blogId);
+  if (!deletedBlog) throw new CustomError("Blog not found", 400);
   const reward = await addRewardPoints({
     userId,
     action: "DELETE_BLOG",
     points: 10,
   });
-  if (!deletedBlog) throw new CustomError("Blog not found", 400);
   return { blogId, reward };
 };
 
@@ -356,8 +395,6 @@ export const userBlogV2 = async (userId: string) => {
   return blogs;
 };
 
-import mongoose from "mongoose";
-
 //save blog
 export const saveBlogV2 = async (userId: string, blogId: string) => {
   const user = await User.findById(userId);
@@ -396,4 +433,186 @@ export const userSavedBlogsV2 = async (userId: string) => {
   }
 
   return user.savedPosts;
+};
+
+export const takeBlogActions = async (
+  blogId: string,
+  action: string,
+  days?: number,
+) => {
+  const blog = await BlogV2.findById(blogId).populate(
+    "user",
+    "firstName lastName profilePicture",
+  );
+
+  if (!blog) {
+    throw new CustomError("Blog not found", 404);
+  }
+
+  const user = await User.findById(blog.user).select("email");
+
+  if (!user) {
+    throw new CustomError("User not found", 404);
+  }
+
+  const email = user.email;
+
+  switch (action) {
+    // DELETE BLOG
+    case "delete":
+      blog.moderationStatus = "deleted";
+      await blog.save();
+
+      return {
+        success: true,
+        message: "Blog removed successfully",
+        blog,
+      };
+
+    // HIDE BLOG
+    case "hide":
+      if (blog.moderationStatus === "deleted") {
+        return {
+          success: true,
+          message: "Can't hide blog. Blog already deleted",
+          blog,
+        };
+      } else if (blog.moderationStatus === "hidden") {
+        blog.moderationStatus = "active";
+        await blog.save();
+
+        return {
+          success: true,
+          message: "Blog un hidden successfully",
+          blog,
+        };
+      } else {
+        blog.moderationStatus = "hidden";
+
+        await blog.save();
+
+        return {
+          success: true,
+          message: "Blog hidden successfully",
+          blog,
+        };
+      }
+
+    // TURN OFF COMMENTS
+    case "comment_off":
+      if (blog.commentsOff) {
+        blog.commentsOff = false;
+        await blog.save();
+
+        return {
+          success: true,
+          message: "Comments on successfully",
+          blog,
+        };
+      } else {
+        blog.commentsOff = true;
+
+        await blog.save();
+
+        return {
+          success: true,
+          message: "Comments disabled successfully",
+          blog,
+        };
+      }
+
+    // WARN USER
+    case "warn_user":
+      const updatedUser = await User.findByIdAndUpdate(
+        blog.user,
+        {
+          $push: {
+            warnings: {
+              reason: "Community guideline violation",
+              createdAt: new Date(),
+            },
+          },
+          $inc: {
+            warningCount: 1,
+          },
+        },
+        { new: true },
+      );
+
+      if (!updatedUser) {
+        throw new CustomError("User not found", 404);
+      }
+
+      if (updatedUser.warningCount >= 10) {
+        updatedUser.isBlocked = true;
+        updatedUser.bannedUntil = null;
+        await updatedUser.save();
+
+        await BlogActionMail({
+          email,
+          action: "perBan",
+        });
+
+        return {
+          success: true,
+          message: "User permanently banned after receiving 10 warnings",
+          blog,
+        };
+      }
+
+      await BlogActionMail({
+        email,
+        action: "warn_user",
+      });
+
+      return {
+        success: true,
+        message: `User warned successfully (${updatedUser.warningCount}/10 warnings)`,
+        blog,
+      };
+
+    // BAN USER
+    case "ban_user":
+      const user = await User.findById(blog.user);
+
+      if (!user) {
+        throw new CustomError("User not found", 404);
+      }
+
+      if (user.isBlocked) {
+        throw new CustomError("User already blocked", 404);
+      }
+
+      if (days === 0) {
+        user.isBlocked = true;
+        user.bannedUntil = null;
+      } else {
+        const bannedUntil = new Date();
+
+        bannedUntil.setDate(bannedUntil.getDate() + Number(days));
+
+        user.isBlocked = true;
+        user.bannedUntil = bannedUntil;
+      }
+
+      await user.save();
+
+      await BlogActionMail({
+        email,
+        action: days === 0 ? "perBan" : "ban_user",
+        days,
+      });
+
+      return {
+        success: true,
+        message:
+          days === 0
+            ? "User permanently banned"
+            : `User banned for ${days} days`,
+        blog,
+      };
+
+    default:
+      throw new CustomError("Invalid action", 400);
+  }
 };

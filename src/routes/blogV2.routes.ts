@@ -14,14 +14,17 @@ import {
   getReplyCommentsV2,
   replyCommentV2,
   saveBlogV2,
+  takeBlogActions,
   toggleLikeV2,
   userSavedBlogsV2,
 } from "../controllers/blogV2Controller";
+import { optionalAuth } from "../middlewares/optionalAuthMiddleware";
 
 const routes = express.Router();
 
 routes.post("/create", userAuth, createBlogV2);
-routes.get("/get", fetchBlogV2);
+routes.get("/get", optionalAuth, fetchBlogV2);
+routes.get("/admin/get", userAuth, fetchBlogV2);
 routes.get("/get/:blogId", userAuth, fetchSingleBlogV2);
 routes.patch("/:blogId/like", userAuth, toggleLikeV2);
 routes.post("/:blogId/comment/post-comments", userAuth, addCommentV2);
@@ -34,6 +37,7 @@ routes.patch("/comment/edit/:commentId", userAuth, editCommentV2);
 routes.patch("/commentoffToggle/:blogId", userAuth, commentOffToggle);
 routes.get("/user", userAuth, fetchUserBlogsV2);
 routes.patch("/save/:blogId", userAuth, saveBlogV2);
-routes.get("/user/saved", userAuth, userSavedBlogsV2)
+routes.get("/user/saved", userAuth, userSavedBlogsV2);
+routes.patch("/takeAction", userAuth, takeBlogActions);
 
 export default routes;

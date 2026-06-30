@@ -13,6 +13,7 @@ import { createServer } from "http";
 import { setupSocket } from "./socket/socket";
 import "./utils/jobOverdue";
 import "./utils/MarkAbsentAttendance";
+import "./utils/checkingBanExpire";
 
 //router
 import authRoutes from "./routes/auth.routes";

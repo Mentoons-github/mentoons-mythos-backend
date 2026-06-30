@@ -15,11 +15,12 @@ import {
 import userAuth from "../middlewares/authMiddleware";
 import passport from "passport";
 import config from "../config/config";
+import { checkUserBan } from "../middlewares/checkUserBanMiddleware";
 
 const router = express.Router();
 
 router.post("/register", registerUser);
-router.post("/login", loginUser);
+router.post("/login", checkUserBan, loginUser);
 router.get("/get-access-token", accessTokenGenerator);
 router.post("/send-otp", sendOtp);
 router.post("/verify-otp", verifyOtpHandler);
@@ -33,7 +34,7 @@ router.get(
   passport.authenticate("google", {
     scope: ["profile", "email"],
     failureRedirect: `${config.FRONTEND_URL}/oauth-result?status=failure&error=auth_start_failed`,
-  })
+  }),
 );
 router.get(
   "/google/callback",
@@ -41,7 +42,7 @@ router.get(
     session: false,
     failureRedirect: `${config.FRONTEND_URL}/oauth-result?status=failure&error=auth_start_failed`,
   }),
-  googleAuthCallback
+  googleAuthCallback,
 );
 
 export default router;

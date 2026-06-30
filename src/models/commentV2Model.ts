@@ -19,6 +19,11 @@ const commentSchema = new Schema<IComment>(
       type: String,
       required: true,
     },
+    moderationStatus: {
+      type: String,
+      enum: ["active", "hidden", "deleted", "ignore"],
+      default: "active",
+    },
   },
   { timestamps: true },
 );

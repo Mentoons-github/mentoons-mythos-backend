@@ -12,4 +12,5 @@ export interface IComment extends Document {
   userId: Types.ObjectId;
   comment: string;
   replyCount: number;
+  moderationStatus: "active" | "hidden" | "deleted" | "ignore";
 }

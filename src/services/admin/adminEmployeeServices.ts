@@ -91,8 +91,6 @@ export const addEmployee = async ({ data }: { data: IEmployee }) => {
   const hashedPassword = await passwordHash(firstPassword);
   const employeeID = await generateEmployeeId(data.designation);
 
-  console.log(employeeID, "idddddddd");
-  console.log(firstPassword, "password...");
 
   const employeeExist = await Employee.findOne({ email: data.email });
   if (employeeExist) throw new CustomError("Employee already Exist", 400);

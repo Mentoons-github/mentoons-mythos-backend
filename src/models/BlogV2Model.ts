@@ -7,7 +7,7 @@ const blogSchema = new mongoose.Schema<IBlogDocument>(
   {
     postType: {
       type: String,
-      enum: ["image", "video", "event", "article", "text"], 
+      enum: ["image", "video", "event", "article", "text"],
       required: true,
     },
     user: {
@@ -58,6 +58,11 @@ const blogSchema = new mongoose.Schema<IBlogDocument>(
     commentCount: {
       type: Number,
       default: 0,
+    },
+    moderationStatus: {
+      type: String,
+      enum: ["active", "hidden", "deleted", "ignore"],
+      default: "active",
     },
   },
   { timestamps: true },

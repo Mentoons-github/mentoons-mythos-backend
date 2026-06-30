@@ -30,6 +30,9 @@ export interface IUser {
     isDeleted?: boolean;
   }[];
   savedPosts: Types.ObjectId[];
+  warningCount: number;
+  warnings: { reason: string; createAt: Date };
+  bannedUntil: Date | null;
 }
 
 export interface AstroReport {
